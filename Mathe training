@@ -1,0 +1,1052 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light dark"><title>Mathe Training</title>
+<style>
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{
+  --bg:#f1f4f9; --surface:#ffffff; --ink:#18202f; --muted:#5a6578; --line:#d7dee9;
+  --accent:#2256d4; --accent-ink:#ffffff; --accent-soft:#e4ecfc;
+  --ok:#0f7a48; --ok-bg:#e2f5ea; --bad:#b3261e; --bad-bg:#fcebe8; --hint-bg:#fff5d6; --hint-ink:#5b4700;
+  --shade:#e7cf9a; --key:#e9edf4;
+  --font-ui:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-math:"Cambria Math","STIX Two Math",Cambria,"Times New Roman",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1420; --surface:#172030; --ink:#e7ecf6; --muted:#9aa6bb; --line:#2a354a;
+    --accent:#7aa2ff; --accent-ink:#0a1020; --accent-soft:#1c2a4a;
+    --ok:#56cf93; --ok-bg:#12301f; --bad:#ff8f80; --bad-bg:#3a1b18; --hint-bg:#332c12; --hint-ink:#f3dd8a;
+    --shade:#6b5a32; --key:#22304a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1420; --surface:#172030; --ink:#e7ecf6; --muted:#9aa6bb; --line:#2a354a;
+  --accent:#7aa2ff; --accent-ink:#0a1020; --accent-soft:#1c2a4a;
+  --ok:#56cf93; --ok-bg:#12301f; --bad:#ff8f80; --bad-bg:#3a1b18; --hint-bg:#332c12; --hint-ink:#f3dd8a;
+  --shade:#6b5a32; --key:#22304a; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--font-ui);margin:0;padding-inline:16px;padding-block:14px 40px;-webkit-text-size-adjust:100%}
+#app{max-width:640px;margin:0 auto}
+h1{font-size:1.7rem;line-height:1.15;margin:6px 0 4px;letter-spacing:-.01em}
+h2{font-size:1.05rem;margin:0 0 10px}
+.muted{color:var(--muted)}
+.sub{color:var(--muted);margin:0 0 16px;font-size:.95rem}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:10px 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font-weight:600;width:100%;text-align:center}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.5;cursor:default}
+.btn:focus-visible,.opt:focus-visible,.key:focus-visible,input:focus-visible,.row:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 16px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:1.4rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.78rem;color:var(--muted);letter-spacing:.03em;text-transform:uppercase}
+.topics{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.row{display:grid;grid-template-columns:10px 1fr auto;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-align:left;width:100%;min-height:56px}
+.dot{width:10px;height:34px;border-radius:5px}
+.row .t{font-weight:600;line-height:1.25}
+.row .m{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.meter{height:5px;border-radius:3px;background:var(--key);margin-top:6px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent)}
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.back{flex:none;width:auto;min-height:44px;padding:8px 14px}
+.bar .ttl{flex:1;min-width:0;font-weight:600;font-size:.92rem;line-height:1.25}
+.score{flex:none;font-variant-numeric:tabular-nums;font-weight:700;font-size:.95rem;text-align:right}
+.prog{height:6px;border-radius:3px;background:var(--key);margin:-2px 0 12px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;min-width:0}
+.intro{margin:0 0 10px}
+.math{font-family:var(--font-math);font-size:1.45rem;line-height:1.9;overflow-x:auto;padding:4px 0;max-width:100%}
+.math.sm{font-size:1.2rem;line-height:1.7;display:inline-block;overflow:visible}
+.math sup{font-size:.68em;line-height:0}
+.op{margin:0 .3em}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .18em;line-height:1.3}
+.fr .n{border-bottom:1.6px solid currentColor;padding:0 .3em .05em}
+.fr .d{padding:.05em .3em 0}
+.steps .fr{font-size:1em}
+.fig{display:block;width:100%;max-width:330px;margin:6px auto 0;font-family:var(--font-math);font-size:15px}
+.fig .shade{fill:var(--shade);stroke:var(--ink);stroke-width:1.2}
+.fig .hole{fill:var(--surface);stroke:var(--ink);stroke-width:1.2}
+.fig text{fill:var(--ink)}
+.field{margin-top:12px}
+.field label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:4px}
+.inwrap{display:flex;gap:8px;align-items:center}
+input[type=text]{flex:1;min-width:0;font:inherit;font-size:1.15rem;min-height:52px;padding:10px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font-family:var(--font-math)}
+input[type=text]:disabled{opacity:.75}
+.unit{color:var(--muted);font-weight:600}
+.keys{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.key{min-width:44px;min-height:44px;padding:4px 10px;border-radius:10px;border:1px solid var(--line);background:var(--key);font-family:var(--font-math);font-size:1.15rem;line-height:1}
+.help{font-size:.82rem;color:var(--muted);margin:8px 0 0}
+.opts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.opts.tf{flex-direction:row}
+.opt{flex:1;display:flex;align-items:center;justify-content:center;gap:12px;min-height:56px;padding:10px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);font-weight:600}
+.opts.mc .opt{justify-content:flex-start}
+.opt.right{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+.hint{background:var(--hint-bg);color:var(--hint-ink);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:.92rem}
+.res{border-radius:12px;padding:12px 14px;margin:12px 0;font-weight:600}
+.res.ok{background:var(--ok-bg);color:var(--ok)}
+.res.bad{background:var(--bad-bg);color:var(--bad)}
+.res small{display:block;font-weight:400;margin-top:2px}
+.ans{margin:8px 0 0;font-size:1rem}
+.ans .math{display:inline-block;font-size:1.3rem;line-height:1.8;overflow:visible;vertical-align:middle}
+.steps{margin:10px 0 0;padding-left:1.3rem}
+.steps li{margin:0 0 10px;padding-left:2px;font-size:.98rem;line-height:1.9}
+.steps b{font-weight:700}
+details summary{cursor:pointer;font-weight:600;padding:8px 0}
+.small{font-size:.82rem}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;padding:10px 4px;font-size:.85rem}
+.sumrow{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.sumrow:first-child{border-top:0}
+.big{font-size:2.4rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+@media (max-width:380px){.opts.tf{flex-direction:column}.grid2{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+</style></head><body>
+<div id="app"></div>
+<script>
+(function(){
+/* ================= ENGINE: RNG, Formatierung, Parser, Prüfung ================= */
+const MINUS = '−';
+const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a; };
+
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function makeR(seed) {
+  const f = mulberry32(seed);
+  return {
+    f,
+    ri: (a, b) => a + Math.floor(f() * (b - a + 1)),
+    pick: (arr) => arr[Math.floor(f() * arr.length)],
+    chance: (p) => f() < p,
+    shuffle: (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(f() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; },
+  };
+}
+
+/* ---------- Anzeige ---------- */
+function fmtNum(n) {
+  const r = Math.round(n * 1e9) / 1e9;
+  let s = String(r);
+  if (/e/i.test(s)) s = r.toFixed(9).replace(/0+$/, '').replace(/\.$/, '');
+  return s.replace('-', MINUS);
+}
+const fmtPlain = (n) => fmtNum(n).replace(MINUS, '-');
+const sup = (e) => '<sup>' + String(e).replace('-', MINUS) + '</sup>';
+const pw = (b, e) => (e === 1 ? b : b + sup(e));
+const frac = (n, d) => '<span class="fr"><span class="n">' + n + '</span><span class="d">' + d + '</span></span>';
+const money = (x) => (Math.round(x * 100) / 100).toFixed(2);
+const Q = (intro, math) => '<p class="intro">' + intro + '</p><div class="math">' + math + '</div>';
+
+function eArr(vars, e) { return vars.map((v) => e[v] || 0); }
+function monoVars(vars, ea, html) {
+  let s = '';
+  vars.forEach((v, i) => { if (ea[i] > 0) s += ea[i] === 1 ? v : (html ? v + sup(ea[i]) : v + '^' + ea[i]); });
+  return s;
+}
+function fmtTerms(vars, terms, html) {
+  if (!terms.length) return '0';
+  let out = '';
+  terms.forEach((t, i) => {
+    const vs = monoVars(vars, eArr(vars, t.e), html);
+    const a = Math.abs(t.c);
+    const cs = (a === 1 && vs) ? '' : fmtPlain(a);
+    const neg = t.c < 0;
+    const mi = html ? MINUS : '-';
+    if (i === 0) out += (neg ? mi : '') + cs + vs;
+    else out += ' ' + (neg ? mi : '+') + ' ' + cs + vs;
+  });
+  return out;
+}
+
+/* ---------- Polynome ---------- */
+function cleanMap(m) { for (const [k, c] of m) { if (Math.abs(c) < 1e-9) m.delete(k); else m.set(k, Math.round(c * 1e9) / 1e9); } }
+function toP(vars, terms) {
+  const m = new Map();
+  terms.forEach((t) => { const k = eArr(vars, t.e).join(','); m.set(k, (m.get(k) || 0) + t.c); });
+  cleanMap(m); return { vars, m };
+}
+function pAdd(a, b, s) { const m = new Map(a.m); for (const [k, c] of b.m) m.set(k, (m.get(k) || 0) + (s || 1) * c); cleanMap(m); return { vars: a.vars, m }; }
+function pMul(a, b) {
+  const m = new Map();
+  for (const [k1, c1] of a.m) for (const [k2, c2] of b.m) {
+    const e1 = k1.split(',').map(Number), e2 = k2.split(',').map(Number);
+    const k = e1.map((x, i) => x + e2[i]).join(',');
+    m.set(k, (m.get(k) || 0) + c1 * c2);
+  }
+  cleanMap(m); return { vars: a.vars, m };
+}
+function pNeg(a) { return pAdd({ vars: a.vars, m: new Map() }, a, -1); }
+function sortedTerms(P) {
+  const arr = [...P.m].map(([k, c]) => ({ c, ea: k.split(',').map(Number) }));
+  arr.sort((A, B) => {
+    const da = A.ea.reduce((s, x) => s + x, 0), db = B.ea.reduce((s, x) => s + x, 0);
+    if (da !== db) return db - da;
+    for (let i = 0; i < A.ea.length; i++) if (A.ea[i] !== B.ea[i]) return B.ea[i] - A.ea[i];
+    return 0;
+  });
+  return arr.map((t) => { const e = {}; P.vars.forEach((v, i) => { e[v] = t.ea[i]; }); return { c: t.c, e }; });
+}
+const pStr = (P, html) => fmtTerms(P.vars, sortedTerms(P), html);
+function tmul(t1, t2) { const e = {}; for (const k of new Set([...Object.keys(t1.e), ...Object.keys(t2.e)])) e[k] = (t1.e[k] || 0) + (t2.e[k] || 0); return { c: t1.c * t2.c, e }; }
+
+/* ---------- Monome (Bruch-Schreibweise) ---------- */
+function monoHTML(cn, cd, vars, e) {
+  const pos = [], neg = [];
+  vars.forEach((v) => { const x = e[v] || 0; if (x > 0) pos.push(pw(v, x)); else if (x < 0) neg.push(pw(v, -x)); });
+  const an = Math.abs(cn), sg = cn < 0 ? MINUS : '';
+  let num = (an === 1 && pos.length) ? '' : String(an);
+  num += pos.join('');
+  let den = (cd === 1 ? '' : String(cd)) + neg.join('');
+  if (!den) return sg + num;
+  return sg + frac(num, den);
+}
+function monoAscii(cn, cd, vars, e) {
+  const pos = [], neg = [];
+  vars.forEach((v) => { const x = e[v] || 0; if (x > 0) pos.push(x === 1 ? v : v + '^' + x); else if (x < 0) neg.push(x === -1 ? v : v + '^' + (-x)); });
+  const an = Math.abs(cn); const nu = [];
+  if (an !== 1 || !pos.length) nu.push(String(an));
+  nu.push(...pos);
+  const de = []; if (cd !== 1) de.push(String(cd)); de.push(...neg);
+  let s = (cn < 0 ? '-' : '') + nu.join('*');
+  if (de.length) s += '/(' + de.join('*') + ')';
+  return s;
+}
+function monoPlain(cn, cd, vars, e) { // Anzeige in Zeilen-Schreibweise als HTML (für Schritte)
+  return monoHTML(cn, cd, vars, e);
+}
+
+/* ---------- Parser ---------- */
+function normalize(s) {
+  s = String(s).replace(/[−–—]/g, '-').replace(/[×·⋅∙]/g, '*')
+    .replace(/[÷:]/g, '/').replace(/,/g, '.').replace(/[{\[]/g, '(').replace(/[}\]]/g, ')')
+    .replace(/€|\s+/g, '');
+  const sm = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁻': '-' };
+  s = s.replace(/[⁰¹²³⁴-⁹⁻]+/g, (m) => '^(' + [...m].map((c) => sm[c]).join('') + ')');
+  return s.toLowerCase();
+}
+function tokenize(s) {
+  const t = []; let i = 0;
+  while (i < s.length) {
+    const c = s[i];
+    if (/\d/.test(c) || (c === '.' && /\d/.test(s[i + 1] || ''))) {
+      let j = i; while (j < s.length && /[\d.]/.test(s[j])) j++;
+      const str = s.slice(i, j);
+      if ((str.match(/\./g) || []).length > 1) throw new Error('Zahl');
+      t.push({ t: 'n', v: parseFloat(str) }); i = j;
+    } else if (/[a-z]/.test(c)) { t.push({ t: 'v', v: c }); i++; }
+    else if ('+-*/^()'.includes(c)) { t.push({ t: c }); i++; }
+    else throw new Error('Zeichen');
+  }
+  const r = [];
+  for (let k = 0; k < t.length; k++) {
+    const a = t[k]; r.push(a); const b = t[k + 1];
+    if (b) {
+      const aEnd = a.t === 'n' || a.t === 'v' || a.t === ')';
+      const bStart = b.t === 'n' || b.t === 'v' || b.t === '(';
+      if (aEnd && bStart) r.push({ t: '*' });
+    }
+  }
+  return r;
+}
+function parse(str) {
+  const tk = tokenize(normalize(str)); let p = 0;
+  const is = (x) => tk[p] && tk[p].t === x;
+  function expr() { let n = term(); while (is('+') || is('-')) { const op = tk[p++].t; const r = term(); n = { k: op === '+' ? 'add' : 'sub', a: n, b: r }; } return n; }
+  function term() { let n = unary(); while (is('*') || is('/')) { const op = tk[p++].t; const r = unary(); n = { k: op === '*' ? 'mul' : 'div', a: n, b: r }; } return n; }
+  function unary() { if (is('-')) { p++; return { k: 'neg', a: unary() }; } if (is('+')) { p++; return unary(); } return power(); }
+  function power() { const b = primary(); if (is('^')) { p++; const e = powexp(); return { k: 'pow', a: b, b: e }; } return b; }
+  function powexp() { if (is('-')) { p++; return { k: 'neg', a: powexp() }; } if (is('+')) { p++; return powexp(); } return power(); }
+  function primary() {
+    const t = tk[p]; if (!t) throw new Error('Ende');
+    if (t.t === 'n') { p++; return { k: 'num', v: t.v }; }
+    if (t.t === 'v') { p++; return { k: 'var', v: t.v }; }
+    if (t.t === '(') { p++; const e = expr(); if (!is(')')) throw new Error('Klammer'); p++; return e; }
+    throw new Error('Unerwartet');
+  }
+  if (!tk.length) throw new Error('leer');
+  const n = expr(); if (p < tk.length) throw new Error('Rest'); return n;
+}
+function ev(n, env) {
+  switch (n.k) {
+    case 'num': return n.v; case 'var': return env[n.v]; case 'neg': return -ev(n.a, env);
+    case 'add': return ev(n.a, env) + ev(n.b, env); case 'sub': return ev(n.a, env) - ev(n.b, env);
+    case 'mul': return ev(n.a, env) * ev(n.b, env); case 'div': return ev(n.a, env) / ev(n.b, env);
+    case 'pow': return Math.pow(ev(n.a, env), ev(n.b, env));
+  }
+  return NaN;
+}
+function walk(n, fn, inExp) {
+  fn(n, !!inExp);
+  switch (n.k) {
+    case 'neg': walk(n.a, fn, inExp); break;
+    case 'pow': walk(n.a, fn, inExp); walk(n.b, fn, true); break;
+    case 'add': case 'sub': case 'mul': case 'div': walk(n.a, fn, inExp); walk(n.b, fn, inExp); break;
+  }
+}
+const varsOf = (n) => { const s = new Set(); walk(n, (x) => { if (x.k === 'var') s.add(x.v); }); return s; };
+const countVars = (n) => { let c = 0; walk(n, (x) => { if (x.k === 'var') c++; }); return c; };
+const hasSum = (n) => { let f = false; walk(n, (x) => { if (x.k === 'add' || x.k === 'sub') f = true; }); return f; };
+function sampleEnv(R) { const env = {}; 'abcdefghijklmnopqrstuvwxyz'.split('').forEach((c) => { env[c] = 1.15 + R() * 2.7; }); return env; }
+function equivalent(a, b) {
+  const R = Math.random;
+  for (let i = 0; i < 7; i++) {
+    const env = sampleEnv(R); const x = ev(a, env), y = ev(b, env);
+    if (!isFinite(x) || !isFinite(y)) return false;
+    if (Math.abs(x - y) > 1e-7 * Math.max(1, Math.abs(x), Math.abs(y))) return false;
+  }
+  return true;
+}
+function constVal(n) { if (varsOf(n).size) return null; return ev(n, {}); }
+function addE(a, b, s) { const r = Object.assign({}, a); for (const k in b) { r[k] = (r[k] || 0) + s * b[k]; } for (const k in r) if (r[k] === 0) delete r[k]; return r; }
+function toMono(n) {
+  switch (n.k) {
+    case 'num': return { c: n.v, e: {} };
+    case 'var': return { c: 1, e: { [n.v]: 1 } };
+    case 'neg': { const m = toMono(n.a); return m && { c: -m.c, e: m.e }; }
+    case 'mul': { const a = toMono(n.a), b = toMono(n.b); return a && b && { c: a.c * b.c, e: addE(a.e, b.e, 1) }; }
+    case 'div': { const a = toMono(n.a), b = toMono(n.b); return a && b && b.c !== 0 && { c: a.c / b.c, e: addE(a.e, b.e, -1) }; }
+    case 'pow': {
+      const k = constVal(n.b); if (k === null || !isFinite(k)) return null;
+      const a = toMono(n.a); if (!a) return null;
+      if (Object.keys(a.e).length && !Number.isInteger(k)) return null;
+      const e = {}; for (const v in a.e) e[v] = a.e[v] * k;
+      return { c: Math.pow(a.c, k), e };
+    }
+  }
+  return null;
+}
+const sameE = (a, b) => { const ks = new Set([...Object.keys(a), ...Object.keys(b)]); for (const k of ks) if ((a[k] || 0) !== (b[k] || 0)) return false; return true; };
+const near = (x, y, t) => Math.abs(x - y) <= (t || 1e-9) * Math.max(1, Math.abs(x), Math.abs(y));
+
+function safeParse(str) { try { return { n: parse(str) }; } catch (e) { return { err: 'Die Eingabe kann nicht gelesen werden. Prüfe Klammern und Zeichen (Hochzahl mit ^, Bruch mit /).' }; } }
+
+/* ---------- Prüfer ---------- */
+function checkMono(user, ans) {
+  const r = safeParse(user); if (r.err) return { ok: false, msg: r.err };
+  const n = r.n; const m = toMono(n);
+  if (!m) return { ok: false, msg: 'Das ist noch keine Potenz oder kein Monom. Fasse alles zu einem Term zusammen.' };
+  if (!near(m.c, ans.c, 1e-9) || !sameE(m.e, ans.e)) return { ok: false, msg: 'Der Wert stimmt nicht.' };
+  const seen = {}; let dup = false; const lits = [];
+  walk(n, (x, inExp) => { if (x.k === 'var') { seen[x.v] = (seen[x.v] || 0) + 1; if (seen[x.v] > 1) dup = true; } if (x.k === 'num' && !inExp) lits.push(x.v); });
+  if (dup) return { ok: false, msg: 'Richtig gerechnet, aber noch nicht zusammengefasst: Jede Variable soll nur einmal vorkommen.' };
+  if (lits.length > 2 || (lits.length === 2 && lits.every(Number.isInteger) && gcd(lits[0], lits[1]) > 1)) return { ok: false, msg: 'Richtig gerechnet, aber die Zahlen sind noch nicht ganz gekürzt.' };
+  return { ok: true };
+}
+function flat(n, sign, out) {
+  if (n.k === 'add') { flat(n.a, sign, out); flat(n.b, sign, out); }
+  else if (n.k === 'sub') { flat(n.a, sign, out); flat(n.b, -sign, out); }
+  else out.push({ n, sign });
+}
+function checkPoly(user, ans) { // ans: {vars, m}
+  const r = safeParse(user); if (r.err) return { ok: false, msg: r.err };
+  const terms = []; flat(r.n, 1, terms);
+  const m = new Map();
+  for (const t of terms) {
+    const mo = toMono(t.n);
+    if (!mo) return { ok: false, msg: 'Noch nicht ausmultipliziert. Löse alle Klammern auf.' };
+    for (const v in mo.e) { if (!ans.vars.includes(v)) return { ok: false, msg: 'Die Variable ' + v + ' kommt in der Aufgabe nicht vor.' }; if (mo.e[v] < 0 || !Number.isInteger(mo.e[v])) return { ok: false, msg: 'Hochzahlen sollen hier positive ganze Zahlen sein.' }; }
+    const c = t.sign * mo.c; const key = eArr(ans.vars, mo.e).join(',');
+    if (m.has(key)) return { ok: false, msg: 'Fasse gleichartige Terme noch zusammen (gleiche Variable, gleiche Hochzahl).' };
+    if (Math.abs(c) > 1e-12) m.set(key, c);
+  }
+  cleanMap(m);
+  if (m.size === ans.m.size) { let ok = true; for (const [k, c] of ans.m) { if (!m.has(k) || !near(m.get(k), c, 1e-7)) ok = false; } if (ok) return { ok: true }; }
+  return { ok: false, msg: 'Nicht ganz. Kontrolliere Vorzeichen und Rechenschritte.' };
+}
+function contentTrivial(n) { // Summenfaktor ohne gemeinsamen Faktor?
+  const terms = []; flat(n, 1, terms);
+  const ms = terms.map((t) => { const m = toMono(t.n); return m && { c: t.sign * m.c, e: m.e }; });
+  if (ms.some((x) => !x)) return true;
+  if (!ms.every((x) => Number.isInteger(x.c))) return true;
+  let g = 0; ms.forEach((x) => { g = gcd(g, x.c); });
+  const vars = new Set(); ms.forEach((x) => Object.keys(x.e).forEach((v) => vars.add(v)));
+  let common = false; vars.forEach((v) => { if (ms.every((x) => (x.e[v] || 0) >= 1)) common = true; });
+  return g <= 1 && !common;
+}
+function factorsOf(n, out) { if (n.k === 'mul') { factorsOf(n.a, out); factorsOf(n.b, out); } else if (n.k === 'neg') factorsOf(n.a, out); else if (n.k === 'pow' && (n.a.k === 'add' || n.a.k === 'sub')) out.push(n.a); else out.push(n); return out; }
+function checkFactor(user, refStr) {
+  const r = safeParse(user); if (r.err) return { ok: false, msg: r.err };
+  const ref = parse(refStr);
+  if (!equivalent(r.n, ref)) return { ok: false, msg: 'Das ist nicht gleich dem Ausgangsterm. Mache die Probe: Multipliziere deine Klammern wieder aus.' };
+  let top = r.n; if (top.k === 'neg') top = top.a;
+  if (!(top.k === 'mul' || top.k === 'pow')) return { ok: false, msg: 'Richtig, aber noch nicht faktorisiert. Das Ergebnis muss ein Produkt sein, zum Beispiel 3x(x + 2).' };
+  const fs = factorsOf(top, []);
+  if (!fs.some((f) => f.k === 'add' || f.k === 'sub')) return { ok: false, msg: 'Es fehlt noch eine Klammer mit einer Summe.' };
+  for (const f of fs) if ((f.k === 'add' || f.k === 'sub') && !contentTrivial(f)) return { ok: false, msg: 'Fast: In einer Klammer steckt noch ein gemeinsamer Faktor. Klammere vollständig aus.' };
+  return { ok: true };
+}
+function checkRat(user, refStr) {
+  const r = safeParse(user); if (r.err) return { ok: false, msg: r.err };
+  const ref = parse(refStr);
+  if (!equivalent(r.n, ref)) return { ok: false, msg: 'Der Wert stimmt nicht. Teste mit einer Zahl für die Variablen.' };
+  const vu = varsOf(r.n), vr = varsOf(ref);
+  for (const v of vu) if (!vr.has(v)) return { ok: false, msg: 'Richtig, aber noch nicht vollständig gekürzt.' };
+  if (countVars(r.n) > countVars(ref)) return { ok: false, msg: 'Richtig, aber noch nicht vollständig gekürzt.' };
+  return { ok: true };
+}
+function checkNum(user, ref, tol) {
+  const r = safeParse(user); if (r.err) return { ok: false, msg: 'Bitte eine Zahl oder einen Bruch eingeben, zum Beispiel 13/36 oder 0.25.' };
+  if (varsOf(r.n).size) return { ok: false, msg: 'Hier wird eine Zahl erwartet, ohne Buchstaben.' };
+  const x = ev(r.n, {});
+  if (!isFinite(x)) return { ok: false, msg: 'Das ist keine gültige Zahl.' };
+  if (Math.abs(x - ref) <= tol + 1e-12) return { ok: true };
+  return { ok: false, msg: 'Der Wert stimmt nicht.' };
+}
+function checkSci(user, exp) { // {m:'8.14', n:-4}
+  const s = normalize(user).replace(/x/g, '*');
+  const mt = s.match(/^(\d+\.?\d*)\*10\^\(?(-?\d+)\)?$/) || s.match(/^(\d+\.?\d*)e(-?\d+)$/);
+  if (!mt) return { ok: false, msg: 'Schreibe die Zahl in der Form 8.14*10^-4 (Kommazahl, mal 10, Hochzahl).' };
+  const m = parseFloat(mt[1]), n = parseInt(mt[2], 10);
+  if (!(m >= 1 && m < 10)) return { ok: false, msg: 'Vor dem Komma muss genau eine Ziffer von 1 bis 9 stehen.' };
+  if (near(m * Math.pow(10, n), parseFloat(exp.m) * Math.pow(10, exp.n), 1e-9) && n === exp.n) return { ok: true };
+  return { ok: false, msg: 'Der Wert oder die Hochzahl stimmt nicht.' };
+}
+/* ================= GENERATOREN ================= */
+const LETTERS = ['a', 'b', 'm', 'n', 'x', 'y', 'z', 't', 'p', 'q', 'r', 'u', 'v', 'w', 'k'];
+const NAMES = ['Irvin', 'Mia', 'Noah', 'Lena', 'Jonas', 'Sara', 'Luca', 'Nora'];
+const step = (...a) => a;
+
+/* ---------- 1. Potenzen ---------- */
+function gPot(R, sub) {
+  if (sub == null) sub = R.pick([0, 0, 1, 2, 2, 3]);
+  if (sub === 0) {
+    const v = R.pick(LETTERS); let c, p, k, q, r, e;
+    do { c = R.ri(2, 6); p = R.pick([-4, -3, -2, 2, 3, 4]); k = R.ri(2, 4); q = R.ri(2, 5); r = R.pick([-1, -2, -3]); e = p * k + q * r; } while (e === 0 || Math.abs(e) > 14);
+    const C = Math.pow(c, k);
+    const steps = [
+      'Klammer 1: Die Hochzahl ' + k + ' gilt für <b>alles</b> in der Klammer, auch für die Zahl ' + c + '.<br>(' + c + pw(v, p) + ')' + sup(k) + ' = ' + c + sup(k) + ' · ' + pw(v, p * k) + ' = ' + C + pw(v, p * k),
+      'Klammer 2: Potenz einer Potenz, Hochzahlen <b>mal</b> nehmen.<br>(' + pw(v, q) + ')' + sup(r) + ' = ' + pw(v, q * r),
+      'Zusammen: gleiche Basis, Hochzahlen <b>addieren</b>: ' + (p * k) + ' + (' + (q * r) + ') = ' + e + '.<br>' + C + pw(v, p * k) + ' · ' + pw(v, q * r) + ' = ' + C + pw(v, e),
+    ];
+    if (e < 0) steps.push('Minus in der Hochzahl heisst: Bruch mit positiver Hochzahl im Nenner.<br>' + C + pw(v, e) + ' = ' + frac(C, pw(v, -e)));
+    return { html: Q('Vereinfache. (Bruch oder negative Hochzahl ist erlaubt.)', '(' + c + pw(v, p) + ')' + sup(k) + ' · (' + pw(v, q) + ')' + sup(r)),
+      kind: 'mono', answer: { c: C, e: { [v]: e } }, ref: monoAscii(C, 1, [v], { [v]: e }), ansHtml: monoHTML(C, 1, [v], { [v]: e }), vars: [v], steps,
+      hint: 'Erst die Klammern auflösen (Hochzahl mal Hochzahl, Zahl auch hoch nehmen), dann gleiche Basen zusammenfassen.' };
+  }
+  if (sub === 1) {
+    const [v, w] = R.shuffle(LETTERS).slice(0, 2); let p1, p2, k, r1, r2, e1, e2;
+    do { p1 = R.pick([-3, -2, 2, 3, 4]); p2 = R.pick([-3, -2, -1, 2, 3]); k = R.ri(2, 3); r1 = R.pick([-3, -2, -1, 1, 2, 3]); r2 = R.pick([-3, -2, -1, 1, 2, 3]); e1 = p1 * k - r1; e2 = p2 * k - r2; } while ((e1 === 0 && e2 === 0) || Math.abs(e1) > 12 || Math.abs(e2) > 12);
+    const e = { [v]: e1, [w]: e2 };
+    const steps = [
+      'Zähler: Die Hochzahl ' + k + ' gilt für beide Faktoren.<br>(' + pw(v, p1) + pw(w, p2) + ')' + sup(k) + ' = ' + pw(v, p1 * k) + pw(w, p2 * k),
+      'Geteilt durch Potenzen: Hochzahlen <b>subtrahieren</b>.<br>' + v + ': ' + (p1 * k) + ' − (' + r1 + ') = ' + e1 + '<br>' + w + ': ' + (p2 * k) + ' − (' + r2 + ') = ' + e2,
+      'Ergebnis: ' + monoHTML(1, 1, [v, w], e),
+    ];
+    return { html: Q('Vereinfache.', frac('(' + pw(v, p1) + pw(w, p2) + ')' + sup(k), pw(v, r1) + pw(w, r2))),
+      kind: 'mono', answer: { c: 1, e }, ref: monoAscii(1, 1, [v, w], e), ansHtml: monoHTML(1, 1, [v, w], e), vars: [v, w], steps,
+      hint: 'Zähler zuerst ausrechnen (Hochzahlen mal). Dann Hochzahlen von oben und unten subtrahieren.' };
+  }
+  if (sub === 2) {
+    let a, b; do { a = R.ri(2, 9); b = R.ri(2, 9); } while (a === b);
+    const e1 = R.pick([1, 1, 2]), e2 = R.pick([1, 2]); const minus = R.chance(0.3);
+    let A = Math.pow(a, e1), B = Math.pow(b, e2);
+    let n1 = 1, n2 = 1; let op = minus ? MINUS : '+';
+    let x1 = a, y1 = e1, x2 = b, y2 = e2;
+    if (minus && A > B) { [x1, y1, x2, y2] = [b, e2, a, e1]; [A, B] = [B, A]; }
+    if (minus && A === B) { return gPot(R, 2); }
+    const d = A * B, nn = minus ? B - A : B + A, g = gcd(nn, d), rn = nn / g, rd = d / g;
+    const val = minus ? 1 / A - 1 / B : 1 / A + 1 / B;
+    const steps = [
+      'Negative Hochzahl heisst Kehrwert: ' + x1 + sup(-y1) + ' = ' + frac(1, pw(x1, y1)) + ' = ' + frac(1, A) + ' und ' + x2 + sup(-y2) + ' = ' + frac(1, B),
+      'Gemeinsamer Nenner ' + d + ': ' + frac(B, d) + ' ' + op + ' ' + frac(A, d) + ' = ' + frac(nn, d),
+      rd === 1 ? 'Ergebnis: ' + rn : (g > 1 ? 'Kürzen (durch ' + g + '): ' : 'Ergebnis (nicht weiter kürzbar): ') + frac(rn, rd),
+    ];
+    return { html: Q('Berechne den Ausdruck. (Antwort als Bruch, z. B. 13/36.)', x1 + sup(-y1) + ' ' + op + ' ' + x2 + sup(-y2)),
+      kind: 'num', tol: 6e-4, answer: val, ref: rn + '/' + rd, ansHtml: rd === 1 ? String(rn) : frac(rn, rd), vars: [], steps,
+      hint: 'a' + '<sup>−1</sup> = 1/a. Wandle jede Potenz in einen Bruch um und suche dann den gemeinsamen Nenner.' };
+  }
+  let p, q; do { p = R.ri(2, 7); q = R.ri(2, 7); } while (p === q || gcd(p, q) !== 1);
+  const n = R.ri(2, 3);
+  const steps = [
+    'Negative Hochzahl bei einem Bruch: Bruch <b>umdrehen</b>, Hochzahl positiv.<br>(' + frac(p, q) + ')' + sup(-n) + ' = (' + frac(q, p) + ')' + sup(n),
+    'Zähler und Nenner hoch ' + n + ': ' + frac(pw(q, n), pw(p, n)) + ' = ' + frac(Math.pow(q, n), Math.pow(p, n)),
+  ];
+  return { html: Q('Berechne. (Antwort als Bruch.)', '(' + frac(p, q) + ')' + sup(-n)),
+    kind: 'num', tol: 6e-4, answer: Math.pow(q / p, n), ref: Math.pow(q, n) + '/' + Math.pow(p, n), ansHtml: frac(Math.pow(q, n), Math.pow(p, n)), vars: [], steps,
+    hint: 'Minus in der Hochzahl: Bruch umdrehen. Dann Zähler und Nenner einzeln potenzieren.' };
+}
+
+/* ---------- 2. Wissenschaftliche Schreibweise ---------- */
+function sciToPlain(m, n) {
+  const parts = m.split('.'); const i = parts[0], d = parts[1] || '';
+  const digits = i + d; const pp = i.length + n;
+  if (pp <= 0) return '0.' + '0'.repeat(-pp) + digits;
+  if (pp >= digits.length) return digits + '0'.repeat(pp - digits.length);
+  return digits.slice(0, pp) + '.' + digits.slice(pp);
+}
+function gSci(R, sub) {
+  if (sub == null) sub = R.pick([0, 0, 1]);
+  const nd = R.ri(1, 8); let m = String(R.ri(1, 9));
+  if (nd > 0) { let dd = ''; for (let i = 0; i < nd; i++) dd += R.ri(0, 9); dd = dd.replace(/0+$/, ''); if (!dd) dd = String(R.ri(1, 9)); m += '.' + dd; }
+  const n = R.chance(0.65) ? -R.ri(2, 9) : R.ri(2, 9);
+  const plain = sciToPlain(m, n);
+  const dirs = n < 0 ? 'nach <b>links</b>' : 'nach <b>rechts</b>';
+  if (sub === 0) {
+    return { html: Q('Schreibe die Zahl ohne Exponenten.', m + '×10' + sup(n)), kind: 'exact', answer: parseFloat(plain), ref: plain, ansHtml: plain, vars: [],
+      steps: ['Die Hochzahl ist ' + String(n).replace('-', MINUS) + '. Das Komma wandert um ' + Math.abs(n) + ' Stellen ' + dirs + (n < 0 ? ' (negativ = kleine Zahl).' : ' (positiv = grosse Zahl, fehlende Stellen mit Nullen füllen).'),
+        m + '×10' + sup(n) + ' = <b>' + plain + '</b>'],
+      hint: 'Negative Hochzahl: Komma nach links (Zahl wird klein). Positive: nach rechts. Jede Stelle zählen, auch Nullen.' };
+  }
+  return { html: Q('Schreibe die Zahl in wissenschaftlicher Schreibweise (eine Ziffer vor dem Komma, mal 10 hoch …). Eingabe z. B. 8.14*10^-4', plain),
+    kind: 'sci', answer: { m, n }, ref: m + '*10^' + n, ansHtml: m + '×10' + sup(n), vars: [],
+    steps: ['Verschiebe das Komma so, dass genau eine Ziffer von 1 bis 9 davor steht: ' + m + '.', 'Gezählt: ' + Math.abs(n) + ' Stellen ' + (n < 0 ? 'nach rechts verschoben, also Hochzahl <b>negativ</b>' : 'nach links verschoben, also Hochzahl <b>positiv</b>') + '.', plain + ' = <b>' + m + '×10' + sup(n) + '</b>'],
+    hint: 'Komma hinter die erste Ziffer ungleich 0 setzen, dann Schritte zählen. Kleine Zahl: negative Hochzahl.' };
+}
+
+/* ---------- 3. Monome kürzen / dividieren ---------- */
+function monoStrHTML(n, vars, e) { // Zahl + Variablen
+  const an = Math.abs(n); const vs = vars.map((v) => (e[v] > 0 ? pw(v, e[v]) : '')).join('');
+  return (n < 0 ? MINUS : '') + ((an === 1 && vs) ? '' : an) + vs;
+}
+function gMono(R, sub) {
+  if (sub == null) sub = R.pick([0, 0, 1]);
+  if (sub === 0) {
+    const vars = R.pick([['x', 'y', 'z'], ['a', 'b', 'c'], ['m', 'n', 'p'], ['u', 'v', 'w']]);
+    let g, s1, s2; do { g = R.ri(1, 6); s1 = R.ri(1, 9); s2 = R.ri(1, 9); } while (gcd(s1, s2) !== 1 || (s1 === 1 && s2 === 1 && g === 1));
+    const n1 = g * s1 * (R.chance(0.5) ? -1 : 1), n2 = g * s2 * (R.chance(0.25) ? -1 : 1);
+    let en, ed, res;
+    do { en = {}; ed = {}; res = {}; vars.forEach((v) => { en[v] = R.ri(1, 5); ed[v] = R.ri(0, 5); res[v] = en[v] - ed[v]; }); } while (vars.every((v) => res[v] === 0));
+    const sgn = (n1 * n2 < 0) ? -1 : 1; const cn = sgn * s1, cd = s2;
+    const denHtml = monoStrHTML(Math.abs(n2), vars, ed) || '1';
+    const numHtml = monoStrHTML(n1, vars, en);
+    const steps = [
+      'Zahlen kürzen: ' + frac(n1 < 0 ? MINUS + Math.abs(n1) : n1, (n2 < 0 ? MINUS : '') + Math.abs(n2)) + ' = ' + (cd === 1 ? String(cn).replace('-', MINUS) : frac((cn < 0 ? MINUS : '') + Math.abs(cn), cd)) + (g > 1 ? ' (durch ' + g + ' gekürzt)' : ''),
+      'Jede Variable einzeln: Hochzahl oben <b>minus</b> Hochzahl unten.<br>' + vars.map((v) => v + ': ' + en[v] + ' − ' + ed[v] + ' = ' + res[v]).join('<br>'),
+      'Positive Ergebnisse bleiben oben, negative wandern (positiv) nach unten, 0 fällt weg.<br>Ergebnis: ' + monoHTML(cn, cd, vars, res),
+    ];
+    return { html: Q('Vereinfache.', frac(numHtml, denHtml)), kind: 'mono', answer: { c: cn / cd, e: res }, ref: monoAscii(cn, cd, vars, res), ansHtml: monoHTML(cn, cd, vars, res), vars, steps,
+      hint: 'Zahlen mit dem grössten gemeinsamen Teiler kürzen. Bei jeder Variable: Hochzahl oben minus Hochzahl unten.' };
+  }
+  const [a, b] = R.pick([['a', 'b'], ['x', 'y'], ['m', 'n'], ['p', 'q']]); const vars = [a, b];
+  const cs = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 21, 25, 35, 121];
+  let n1, d1, n3, d3; do { n1 = R.pick(cs); d1 = R.pick(cs); n3 = R.pick(cs); d3 = R.pick(cs); } while (gcd(n1 * d3, d1 * n3) === Math.min(n1 * d3, d1 * n3) && false);
+  const A1 = { [a]: R.ri(1, 5), [b]: R.ri(1, 5) }, A2 = { [a]: R.ri(1, 5), [b]: R.ri(1, 5) }, B1 = { [a]: R.ri(1, 5), [b]: R.ri(1, 5) }, B2 = { [a]: R.ri(1, 5), [b]: R.ri(1, 5) };
+  const res = {}; vars.forEach((v) => { res[v] = (A1[v] + B2[v]) - (A2[v] + B1[v]); });
+  const cnr = n1 * d3, cdr = d1 * n3, g = gcd(cnr, cdr); const cn = cnr / g, cd = cdr / g;
+  const steps = [
+    'Durch einen Bruch teilen heisst: <b>mit dem Kehrwert multiplizieren</b>.<br>' + frac(monoStrHTML(n1, vars, A1), monoStrHTML(d1, vars, A2)) + ' · ' + frac(monoStrHTML(d3, vars, B2), monoStrHTML(n3, vars, B1)),
+    'Zusammen: Zahlen ' + frac(n1 * d3, d1 * n3) + ' = ' + frac(cn, cd) + (cd === 1 ? ' = ' + cn : '') + '. Variablen: Hochzahlen oben addieren, unten addieren, dann subtrahieren.<br>' + vars.map((v) => v + ': (' + A1[v] + ' + ' + B2[v] + ') − (' + A2[v] + ' + ' + B1[v] + ') = ' + res[v]).join('<br>'),
+    'Ergebnis: ' + monoHTML(cn, cd, vars, res),
+  ];
+  return { html: Q('Dividiere.', frac(monoStrHTML(n1, vars, A1), monoStrHTML(d1, vars, A2)) + ' <span class="op">÷</span> ' + frac(monoStrHTML(n3, vars, B1), monoStrHTML(d3, vars, B2))),
+    kind: 'mono', answer: { c: cn / cd, e: res }, ref: monoAscii(cn, cd, vars, res), ansHtml: monoHTML(cn, cd, vars, res), vars, steps,
+    hint: 'Zweiten Bruch umdrehen und mit dem ersten multiplizieren. Dann Zahlen kürzen und Hochzahlen verrechnen.' };
+}
+
+/* ---------- 4. Prozent ---------- */
+function gPct(R, sub) {
+  if (sub == null) sub = R.pick([0, 0, 1, 2, 3, 4]);
+  const name = R.pick(NAMES);
+  if (sub === 0) {
+    const obj = R.pick([['ein Auto', 'Autos'], ['ein Motorrad', 'Motorrads'], ['einen Laptop', 'Laptops'], ['ein Boot', 'Boots']]);
+    const P = 400 * R.ri(10, 70), p = R.pick([10, 15, 20, 25, 30]), q = 1 - p / 100, v1 = P * q, v2 = v1 * q;
+    return { html: '<p class="intro">' + name + ' kauft ' + obj[0] + ' für ' + P + ' Euro. Es verliert in jedem Jahr ' + p + ' % an Wert. Welches ist der Wert nach 1 Jahr, nach 2 Jahren?</p>',
+      kind: 'multi', fields: [{ label: 'Wert nach 1 Jahr', unit: 'Euro', answer: v1, tol: 0.006 }, { label: 'Wert nach 2 Jahren', unit: 'Euro', answer: v2, tol: 0.006 }],
+      ref: [money(v1), money(v2)], ansHtml: 'Nach 1 Jahr: <b>' + money(v1) + ' Euro</b><br>Nach 2 Jahren: <b>' + money(v2) + ' Euro</b>', vars: [],
+      steps: ['Verlust ' + p + ' % heisst: es bleiben ' + (100 - p) + ' %. Faktor q = 1 − ' + p / 100 + ' = <b>' + q + '</b>', 'Nach 1 Jahr: ' + P + ' · ' + q + ' = <b>' + money(v1) + '</b>', 'Nach 2 Jahren: ' + money(v1) + ' · ' + q + ' = <b>' + money(v2) + '</b> (die ' + p + ' % gelten vom <i>neuen</i> Wert, nicht vom Anfangswert)'],
+      hint: 'Faktor = 1 − Prozentsatz/100. Für das zweite Jahr nochmals mit dem Faktor multiplizieren.' };
+  }
+  if (sub === 1) {
+    const N = R.ri(5, 60) * 10, B = N * 1.19;
+    return { html: '<p class="intro">' + name + ' bestellt Getränke für eine Feier. Die Nettopreisliste (ohne Mehrwertsteuer) ergibt ' + N + ' €. Privatkunden zahlen zusätzlich 19 % Mehrwertsteuer. Wie viel muss ' + name + ' bezahlen? (2 Stellen nach dem Dezimalpunkt)</p>',
+      kind: 'money', answer: B, tol: 0.006, ref: money(B), ansHtml: '<b>' + money(B) + ' €</b>', vars: [], unit: '€',
+      steps: ['Brutto = Netto · 1.19 (100 % + 19 % = 119 %)', N + ' · 1.19 = <b>' + money(B) + ' €</b>', 'Kontrolle: Steueranteil ' + N + ' · 0.19 = ' + money(N * 0.19) + ' €, dazu ' + N + ' € ergibt ' + money(B) + ' €.'],
+      hint: 'Brutto = Netto · 1.19. Nicht nur 19 € addieren, es sind 19 Prozent!' };
+  }
+  if (sub === 2) {
+    const N = R.ri(5, 80) * 10, B = N * 1.19;
+    return { html: '<p class="intro">Ein Gerät kostet inklusive 19 % Mehrwertsteuer ' + money(B) + ' €. Wie hoch ist der Nettopreis (ohne Mehrwertsteuer)? (2 Stellen nach dem Dezimalpunkt)</p>',
+      kind: 'money', answer: N, tol: 0.006, ref: money(N), ansHtml: '<b>' + money(N) + ' €</b>', vars: [], unit: '€',
+      steps: ['Der Bruttopreis entspricht 119 %. Also: Netto = Brutto : 1.19', money(B) + ' : 1.19 = <b>' + money(N) + ' €</b>', 'Typischer Fehler: Brutto mal 0.81 rechnen. Das stimmt nicht, weil die 19 % vom Nettopreis berechnet werden.'],
+      hint: 'Rückwärts rechnen: durch 1.19 teilen (nicht minus 19 %).' };
+  }
+  if (sub === 3) {
+    const P = 100 * R.ri(10, 120), p = R.pick([2, 4, 5, 8, 10, 20]), q = 1 + p / 100, v1 = P * q, v2 = v1 * q;
+    return { html: '<p class="intro">' + name + ' legt ' + P + ' € an. Das Geld wird jedes Jahr mit ' + p + ' % verzinst (Zinsen werden dazugerechnet). Wie viel ist es nach 1 Jahr, nach 2 Jahren? (auf Cent runden)</p>',
+      kind: 'multi', fields: [{ label: 'Nach 1 Jahr', unit: '€', answer: v1, tol: 0.006 }, { label: 'Nach 2 Jahren', unit: '€', answer: v2, tol: 0.006 }],
+      ref: [money(v1), money(v2)], ansHtml: 'Nach 1 Jahr: <b>' + money(v1) + ' €</b><br>Nach 2 Jahren: <b>' + money(v2) + ' €</b>', vars: [],
+      steps: ['Zunahme um ' + p + ' %: Faktor q = 1 + ' + p / 100 + ' = <b>' + q + '</b>', 'Nach 1 Jahr: ' + P + ' · ' + q + ' = <b>' + money(v1) + '</b>', 'Nach 2 Jahren: ' + money(v1) + ' · ' + q + ' = <b>' + money(v2) + '</b>'],
+      hint: 'Faktor = 1 + Prozentsatz/100, dann jedes Jahr nochmals mal Faktor.' };
+  }
+  const A = 20 * R.ri(3, 40), p = R.pick([10, 15, 20, 25, 30, 40, 50]), B = A * (1 - p / 100);
+  return { html: '<p class="intro">Ein Artikel kostete früher ' + A + ' €. Jetzt kostet er ' + money(B).replace(/\.00$/, '') + ' €. Um wie viel Prozent wurde der Preis gesenkt?</p>',
+    kind: 'num', tol: 0.006, answer: p, ref: String(p), ansHtml: '<b>' + p + ' %</b>', vars: [], unit: '%',
+    steps: ['Ermässigung in Euro: ' + A + ' − ' + money(B).replace(/\.00$/, '') + ' = ' + money(A - B).replace(/\.00$/, '') + ' €', 'Anteil vom alten Preis: ' + money(A - B).replace(/\.00$/, '') + ' : ' + A + ' = ' + (p / 100) + ' = <b>' + p + ' %</b>'],
+    hint: 'Prozentsatz = Änderung : alter Wert · 100. Immer auf den alten Wert beziehen.' };
+}
+/* ---------- 5. Terme aufstellen ---------- */
+function svgHole(w, h, hw, hh) {
+  return '<svg viewBox="0 0 320 150" class="fig" role="img" aria-label="Rechteck mit ausgeschnittenem Loch"><rect x="20" y="22" width="250" height="100" class="shade"/><rect x="112" y="40" width="64" height="48" class="hole"/>' +
+    '<text x="145" y="34" text-anchor="middle">' + hw + '</text><text x="106" y="68" text-anchor="end">' + hh + '</text>' +
+    '<text x="145" y="142" text-anchor="middle">' + w + '</text><text x="278" y="76" text-anchor="start">' + h + '</text></svg>';
+}
+const linHTML = (vars, terms) => fmtTerms(vars, terms, true);
+function gTerm(R, sub) {
+  if (sub == null) sub = R.pick([0, 0, 1, 2]);
+  const X = ['x'];
+  if (sub === 0) {
+    const k = R.ri(2, 5), c = R.ri(1, 4), d1 = R.ri(1, 4); const square = R.chance(0.6); const d2 = square ? d1 : R.ri(1, 4);
+    const W = [{ c: k, e: { x: 1 } }, { c: -c, e: {} }], H = [{ c: 1, e: { x: 1 } }];
+    const h1 = [{ c: 1, e: { x: 1 } }, { c: -d1, e: {} }], h2 = [{ c: 1, e: { x: 1 } }, { c: -d2, e: {} }];
+    const big = pMul(toP(X, W), toP(X, H)), hole = pMul(toP(X, h1), toP(X, h2)), res = pAdd(big, hole, -1);
+    const wl = linHTML(X, W), hl = 'x', a1 = linHTML(X, h1), a2 = linHTML(X, h2);
+    const steps = ['Schattiert = Gesamtfläche − Loch.', 'Gesamtfläche: x · (' + wl + ') = ' + pStr(big, true), 'Loch: (' + a1 + ')(' + a2 + ') = ' + pStr(hole, true) + (square ? ' (binomische Formel)' : ''),
+      'Differenz, das Loch <b>in Klammern</b>:<br>' + pStr(big, true) + ' − (' + pStr(hole, true) + ')', 'Minus vor der Klammer: alle Vorzeichen drehen, dann zusammenfassen:<br><b>' + pStr(res, true) + '</b>'];
+    return { html: '<p class="intro">Bestimme einen algebraischen Ausdruck für die Fläche der schattierten Region. (Vereinfachen, nicht in Faktoren zerlegen.)</p>' + svgHole(wl, hl, a1, a2),
+      kind: 'poly', answer: res, ref: pStr(res, false), ansHtml: pStr(res, true), vars: X, steps,
+      hint: 'Fläche des ganzen Rechtecks minus Fläche des Lochs. Das Loch in Klammern setzen und danach die Vorzeichen drehen.' };
+  }
+  const a = R.pick([1, 2, 3, 4, 0.5, 1.5, 2.5]), b = R.pick([60, 80, 90, 95, 120, 150]);
+  const c = R.pick([0.1, 0.125, 0.2, 0.25, 0.5]), d = R.pick([10, 15, 20, 25, 30, 40]); const f = R.chance(0.35) ? R.ri(1, 5) * 100 : 0;
+  const E = [{ c: -a, e: { x: 2 } }, { c: b, e: { x: 1 } }], K = [{ c: c, e: { x: 2 } }, { c: d, e: { x: 1 } }]; if (f) K.push({ c: f, e: {} });
+  const Ep = toP(X, E), Kp = toP(X, K), G = pAdd(Ep, Kp, -1);
+  const text = '<p class="intro">Der Erlös (in Euro) aus Herstellung und Verkauf von x Rechnern an einem Tag ist gegeben durch ' + fmtTerms(X, E, true) + '. Die Kosten dafür sind gegeben durch ' + fmtTerms(X, K, true) + '.</p>';
+  const steps = ['Gewinn = Erlös − Kosten.', 'G(x) = (' + fmtTerms(X, E, true) + ') − (' + fmtTerms(X, K, true) + ')', 'Minus vor der Klammer: Vorzeichen der Kosten drehen:<br>' + fmtTerms(X, E, true) + ' ' + K.map((t) => (t.c > 0 ? MINUS : '+') + ' ' + fmtTerms(X, [{ c: Math.abs(t.c), e: t.e }], true)).join(' '), 'Gleichartige Terme zusammenfassen: <b>' + pStr(G, true) + '</b>'];
+  if (sub === 1) return { html: text + '<p class="intro"><b>Schreibe einen Ausdruck für den Gewinn.</b> (Vereinfachen, ganze oder Dezimalzahlen.)</p>', kind: 'poly', answer: G, ref: pStr(G, false), ansHtml: pStr(G, true), vars: X, steps,
+    hint: 'Gewinn = Erlös − Kosten. Kosten in Klammern, Vorzeichen drehen, dann x² mit x² und x mit x zusammenfassen.' };
+  const x0 = R.pick([10, 20, 30, 40, 50]); const gv = ev(parse(pStr(G, false)), { x: x0 });
+  return { html: text + '<p class="intro"><b>Wie gross ist der Gewinn bei x = ' + x0 + ' Rechnern?</b> (in Euro)</p>', kind: 'num', tol: 0.006, answer: gv, ref: fmtPlain(gv), ansHtml: '<b>' + fmtNum(gv) + ' €</b>', vars: [], unit: '€',
+    steps: steps.slice(0, 1).concat(['G(x) = ' + pStr(G, true), 'Einsetzen x = ' + x0 + ': ' + fmtNum(G.m.get('2') || 0) + ' · ' + x0 + sup(2) + ' + ' + fmtNum(G.m.get('1') || 0) + ' · ' + x0 + (G.m.get('0') ? ' + (' + fmtNum(G.m.get('0')) + ')' : '') + ' = <b>' + fmtNum(gv) + ' €</b>']),
+    hint: 'Erst G(x) = Erlös − Kosten aufstellen, dann x einsetzen.' };
+}
+
+/* ---------- 6. Klammern & Polynome ---------- */
+const SHAPES = { A2: (v) => ({ [v[0]]: 2 }), B2: (v) => ({ [v[1]]: 2 }), A1: (v) => ({ [v[0]]: 1 }), B1: (v) => ({ [v[1]]: 1 }), AB: (v) => ({ [v[0]]: 1, [v[1]]: 1 }) };
+function randPoly(R, vars, n, pool) { const shapes = R.shuffle(pool).slice(0, n); return shapes.map((s) => ({ c: R.pick([-9, -8, -7, -6, -5, -4, -3, -2, 2, 3, 4, 5, 6, 7, 8, 9]), e: SHAPES[s](vars) })); }
+function listHTML(vars, terms) { return fmtTerms(vars, terms, true); }
+function gKlam(R, sub) {
+  if (sub == null) sub = R.pick([0, 1, 2, 2]);
+  const vars = R.pick([['m', 'n'], ['a', 'b'], ['x', 'y'], ['p', 'q']]); const pool = ['A2', 'B2', 'A1', 'B1'];
+  let res, html, steps;
+  do {
+    if (sub === 0) {
+      const P1 = randPoly(R, vars, 3, pool), P2 = randPoly(R, vars, 3, pool);
+      const p1 = toP(vars, P1), p2 = toP(vars, P2); res = pAdd(p1, p2, -1);
+      const neg = P2.map((t) => ({ c: -t.c, e: t.e }));
+      html = '(' + listHTML(vars, P1) + ') − (' + listHTML(vars, P2) + ')';
+      steps = ['Minus vor der Klammer: alle Vorzeichen in der Klammer drehen.<br>' + listHTML(vars, P1) + ' ' + neg.map((t) => (t.c < 0 ? MINUS : '+') + ' ' + listHTML(vars, [{ c: Math.abs(t.c), e: t.e }])).join(' '), 'Gleichartige Terme zusammenfassen (gleiche Variable und gleiche Hochzahl): <b>' + pStr(res, true) + '</b>'];
+    } else if (sub === 1) {
+      const P1 = randPoly(R, vars, 3, pool), P2 = randPoly(R, vars, 2, pool), P3 = randPoly(R, vars, 2, pool);
+      res = pAdd(pAdd(toP(vars, P1), toP(vars, P2), 1), toP(vars, P3), -1);
+      html = '(' + listHTML(vars, P1) + ') + (' + listHTML(vars, P2) + ') − (' + listHTML(vars, P3) + ')';
+      const neg = P3.map((t) => ({ c: -t.c, e: t.e }));
+      steps = ['Plus vor der Klammer: Klammer weglassen. Minus: Vorzeichen drehen.<br>' + listHTML(vars, P1.concat(P2).concat(neg)), 'Zusammenfassen: <b>' + pStr(res, true) + '</b>'];
+    } else {
+      const P1 = randPoly(R, vars, 3, pool), P2 = randPoly(R, vars, 3, pool), P3 = randPoly(R, vars, 1, pool), P4 = randPoly(R, vars, 1, pool);
+      const inner = pAdd(pAdd(toP(vars, P2), toP(vars, P3), 1), toP(vars, P4), 1); res = pAdd(toP(vars, P1), inner, -1);
+      const t4 = P4[0]; const t4s = (t4.c < 0 ? MINUS : '+') + ' ' + listHTML(vars, [{ c: Math.abs(t4.c), e: t4.e }]);
+      html = '(' + listHTML(vars, P1) + ') − [(' + listHTML(vars, P2) + ') + (' + listHTML(vars, P3) + ') ' + t4s + ']';
+      const innerTerms = sortedTerms(inner); const neg = innerTerms.map((t) => ({ c: -t.c, e: t.e }));
+      steps = ['Von innen nach aussen. Innere eckige Klammer zusammenfassen:<br>(' + listHTML(vars, P2) + ') + (' + listHTML(vars, P3) + ') ' + t4s + ' = ' + pStr(inner, true),
+        'Minus vor der eckigen Klammer: alle Vorzeichen drehen.<br>' + listHTML(vars, P1) + ' ' + neg.map((t) => (t.c < 0 ? MINUS : '+') + ' ' + listHTML(vars, [{ c: Math.abs(t.c), e: t.e }])).join(' '), 'Gleichartige Terme zusammenfassen: <b>' + pStr(res, true) + '</b>'];
+    }
+  } while (res.m.size === 0);
+  return { html: Q('Führe die Operationen durch und vereinfache.', html), kind: 'poly', answer: res, ref: pStr(res, false), ansHtml: pStr(res, true), vars, steps,
+    hint: 'Innere Klammern zuerst. Minus vor einer Klammer dreht jedes Vorzeichen. Danach nur gleiche Variablen mit gleicher Hochzahl zusammenfassen.' };
+}
+
+/* ---------- 7. Distributivgesetz ---------- */
+function gDist(R, sub) {
+  if (sub == null) sub = R.pick([0, 0, 1, 2]);
+  const v = R.pick(['x', 'y', 'a', 'z', 'm', 't']); const X = [v]; const T = (c, e) => ({ c, e: e ? { [v]: e } : {} });
+  const nz = (a, b) => { let x; do { x = R.ri(a, b); } while (x === 0); return x; };
+  let A, B;
+  if (sub === 0) { A = [T(nz(-5, 5), 1), T(nz(-7, 7), 0)]; B = [T(R.ri(1, 4), 2), T(nz(-6, 6), 1), T(nz(-7, 7), 0)]; }
+  else if (sub === 1) { A = [T(1, 1), T(nz(-9, 9), 0)]; B = [T(1, 1), T(nz(-9, 9), 0)]; }
+  else { A = [T(nz(-4, 4), 1), T(nz(-8, 8), 0)]; B = [T(nz(-4, 4), 1), T(nz(-8, 8), 0)]; }
+  const prods = []; A.forEach((a) => B.forEach((b) => prods.push(tmul(a, b))));
+  const res = toP(X, prods);
+  const pieces = []; A.forEach((a) => B.forEach((b) => pieces.push('(' + listHTML(X, [a]) + ')·(' + listHTML(X, [b]) + ') = ' + listHTML(X, [tmul(a, b)]))));
+  const steps = ['<b>Jeder mit jedem</b>: Multipliziere jeden Summanden der ersten Klammer mit jedem Summanden der zweiten. Vorzeichen mitnehmen.<br>' + pieces.join('<br>'), 'Alles hintereinander geschrieben:<br>' + listHTML(X, prods), 'Gleichartige Terme zusammenfassen: <b>' + pStr(res, true) + '</b>'];
+  return { html: Q('Verwende das Distributivgesetz, um den Ausdruck zu multiplizieren. (Vereinfachen.)', '(' + listHTML(X, A) + ')(' + listHTML(X, B) + ')'), kind: 'poly', answer: res, ref: pStr(res, false), ansHtml: pStr(res, true), vars: X, steps,
+    hint: 'Jeder Summand der ersten Klammer mal jeder Summand der zweiten. Minuszeichen gehört zum Term dahinter.' };
+}
+
+/* ---------- 8. Binomische Formeln ---------- */
+function gBinom(R, sub) {
+  if (sub == null) sub = R.pick([0, 0, 1, 1, 2]);
+  const v = R.pick(['x', 'y', 'z', 'm', 'n', 't']); const X = [v];
+  const k = R.ri(1, 6), m = R.ri(1, 9); const kv = k === 1 ? v : k + v;
+  if (sub === 2) {
+    const kk = R.ri(1, 5), mm = R.ri(2, 9); const ask = R.pick(['last', 'mid']);
+    if (ask === 'last') return { html: Q('Ergänze so, dass ein Quadrat einer Summe entsteht. Welche Zahl gehört an die Stelle des Fragezeichens?', pw(v, 2) + ' + ' + (2 * mm) + v + ' + ?'), kind: 'num', tol: 1e-9, answer: mm * mm, ref: String(mm * mm), ansHtml: '<b>' + mm * mm + '</b>', vars: [],
+      steps: ['Formel: (a + b)² = a² + 2ab + b². Hier ist a = ' + v + ' und 2ab = ' + 2 * mm + v + ', also b = ' + mm + '.', 'Das letzte Glied ist b² = ' + mm + '² = <b>' + mm * mm + '</b>.'], hint: 'Der Mittelterm ist 2ab. Teile ihn durch 2, dann hast du b, und b² fehlt.' };
+    return { html: Q('Für welche Zahl ? gilt die Gleichung?', '(' + v + ' + ?)' + sup(2) + ' = ' + pw(v, 2) + ' + ' + (2 * mm) + v + ' + ' + mm * mm), kind: 'num', tol: 1e-9, answer: mm, ref: String(mm), ansHtml: '<b>' + mm + '</b>', vars: [],
+      steps: ['Das letzte Glied ist b² = ' + mm * mm + ', also b = ' + mm + '.', 'Kontrolle Mittelterm: 2·' + v + '·' + mm + ' = ' + 2 * mm + v + '. Stimmt.'], hint: 'Das letzte Glied ist b². Ziehe die Wurzel.' };
+  }
+  const type = R.pick(['plus', 'minus', 'diff']);
+  let left, correct, steps;
+  if (type === 'plus') { correct = toP(X, [{ c: k * k, e: { [v]: 2 } }, { c: 2 * k * m, e: { [v]: 1 } }, { c: m * m, e: {} }]); left = '(' + kv + ' + ' + m + ')' + sup(2); }
+  else if (type === 'minus') { correct = toP(X, [{ c: k * k, e: { [v]: 2 } }, { c: -2 * k * m, e: { [v]: 1 } }, { c: m * m, e: {} }]); left = '(' + kv + ' ' + MINUS + ' ' + m + ')' + sup(2); }
+  else { correct = toP(X, [{ c: k * k, e: { [v]: 2 } }, { c: -m * m, e: {} }]); left = '(' + kv + ' + ' + m + ')(' + kv + ' ' + MINUS + ' ' + m + ')'; }
+  const formula = type === 'plus' ? '(a + b)² = a² + 2ab + b²' : type === 'minus' ? '(a − b)² = a² − 2ab + b²' : '(a + b)(a − b) = a² − b²';
+  steps = ['Passende Formel: ' + formula + '. Hier ist a = ' + kv + ' und b = ' + m + '.', 'a² = ' + (k === 1 ? v : '(' + kv + ')') + sup(2) + ' = ' + pw(k * k === 1 ? v : k * k + v, 2).replace(/<sup>2<\/sup>$/, '') + (k === 1 ? sup(2) : sup(2)).replace(/^/, ''), ''];
+  steps[1] = 'a² = (' + kv + ')² = ' + (k * k === 1 ? '' : k * k) + v + sup(2) + (k > 1 ? ' (die Zahl ' + k + ' wird mitquadriert!)' : '') + ', &nbsp; b² = ' + m + '² = ' + m * m + (type !== 'diff' ? ', &nbsp; 2ab = 2·' + kv + '·' + m + ' = ' + 2 * k * m + v : '');
+  steps[2] = 'Ergebnis: <b>' + pStr(correct, true) + '</b>';
+  if (sub === 0) return { html: Q('Multipliziere aus (binomische Formel).', left), kind: 'poly', answer: correct, ref: pStr(correct, false), ansHtml: pStr(correct, true), vars: X, steps, hint: 'Formeln: (a+b)² = a²+2ab+b², (a−b)² = a²−2ab+b², (a+b)(a−b) = a²−b². Der Mittelterm 2ab darf nicht fehlen.' };
+  // wahr/falsch
+  const isTrue = R.chance(0.45); let right = correct, why = '';
+  if (!isTrue) {
+    const opts = [];
+    if (type !== 'diff') {
+      const mid = type === 'plus' ? 1 : -1;
+      opts.push([toP(X, [{ c: k * k, e: { [v]: 2 } }, { c: k * m * mid, e: { [v]: 1 } }, { c: m * m, e: {} }]), 'Der Mittelterm ist 2ab = ' + 2 * k * m + v + ', nicht ' + k * m + v + '.']);
+      opts.push([toP(X, [{ c: k * k, e: { [v]: 2 } }, { c: 2 * k * m * mid, e: { [v]: 1 } }, { c: -m * m, e: {} }]), 'Das letzte Glied b² ist immer positiv: +' + m * m + '.']);
+      opts.push([toP(X, [{ c: k * k, e: { [v]: 2 } }, { c: m * m, e: {} }]), 'Der Mittelterm 2ab fehlt.']);
+      opts.push([toP(X, [{ c: k * k, e: { [v]: 2 } }, { c: -2 * k * m * mid, e: { [v]: 1 } }, { c: m * m, e: {} }]), 'Das Vorzeichen des Mittelterms stimmt nicht: ' + (type === 'plus' ? 'bei (a + b)² ist er +' : 'bei (a − b)² ist er −') + '.']);
+      if (k > 1) opts.push([toP(X, [{ c: k, e: { [v]: 2 } }, { c: 2 * k * m * mid, e: { [v]: 1 } }, { c: m * m, e: {} }]), 'Die Zahl vor ' + v + ' muss mitquadriert werden: (' + kv + ')² = ' + k * k + v + '².']);
+    } else {
+      opts.push([toP(X, [{ c: k * k, e: { [v]: 2 } }, { c: m * m, e: {} }]), 'Bei (a + b)(a − b) ist das Ergebnis a² <b>−</b> b²: ' + MINUS + m * m + '.']);
+      opts.push([toP(X, [{ c: k * k, e: { [v]: 2 } }, { c: -2 * k * m, e: { [v]: 1 } }, { c: m * m, e: {} }]), 'Hier gibt es keinen Mittelterm, er hebt sich auf.']);
+      if (k > 1) opts.push([toP(X, [{ c: k, e: { [v]: 2 } }, { c: -m * m, e: {} }]), 'Die Zahl vor ' + v + ' muss mitquadriert werden: (' + kv + ')² = ' + k * k + v + '².']);
+    }
+    const o = R.pick(opts); right = o[0]; why = o[1];
+  }
+  const same = pStr(right, false) === pStr(correct, false);
+  const truth = same;
+  return { html: Q('Entscheide, ob die Aussage über die quadratischen Identitäten <b>wahr</b> oder <b>falsch</b> ist.', left + ' = ' + pStr(right, true)), kind: 'tf', correct: truth ? 0 : 1, options: ['Wahr', 'Falsch'], ref: truth ? 'Wahr' : 'Falsch', ansHtml: truth ? 'Wahr' : 'Falsch', vars: [],
+    steps: truth ? steps : ['Richtig ausgerechnet: ' + left + ' = <b>' + pStr(correct, true) + '</b>'].concat(steps.slice(0, 2), [why || 'Die rechte Seite stimmt nicht mit dem Ergebnis überein.']), hint: 'Rechne die linke Seite selbst mit der binomischen Formel aus und vergleiche. Achte auf Mittelterm, Vorzeichen und quadrierte Zahlen.' };
+}
+
+/* ---------- 9. Faktorisieren ---------- */
+function gFakt(R, sub) {
+  if (sub == null) sub = R.pick([0, 1, 1, 2]);
+  const nz = (a, b) => { let x; do { x = R.ri(a, b); } while (x === 0); return x; };
+  if (sub === 0) {
+    const v = R.pick(['x', 'y', 'a', 'm']); const X = [v]; let a, b; do { a = R.ri(1, 6); b = nz(-9, 9); } while (gcd(a, b) !== 1);
+    const c = R.ri(2, 9), j = R.ri(0, 2) || 0, three = R.chance(0.3);
+    const inner = three ? [{ c: a, e: { [v]: 2 } }, { c: b, e: { [v]: 1 } }, { c: nz(-7, 7), e: {} }] : [{ c: a, e: { [v]: 1 } }, { c: b, e: {} }];
+    if (three) { let g0 = 0; inner.forEach((t) => { g0 = gcd(g0, t.c); }); if (g0 > 1) return gFakt(R, sub); }
+    const f = [{ c, e: j ? { [v]: j } : {} }]; const prod = toP(X, inner.map((t) => tmul(f[0], t)));
+    const fs = fmtTerms(X, f, false), is = fmtTerms(X, inner, false);
+    const steps = ['Suche den grössten gemeinsamen Faktor aller Terme: Zahl (ggT) und die Variable mit der kleinsten Hochzahl.', 'Gemeinsamer Faktor: <b>' + fmtTerms(X, f, true) + '</b>', 'Jeden Term dadurch teilen, der Rest kommt in die Klammer:<br>' + pStr(prod, true) + ' = <b>' + fmtTerms(X, f, true) + '(' + fmtTerms(X, inner, true) + ')</b>', 'Probe: Klammer wieder ausmultiplizieren, es muss der Ausgangsterm entstehen.'];
+    return { html: Q('Klammere den grössten gemeinsamen Faktor aus. (Eingabe z. B. 6x(2x-3))', pStr(prod, true)), kind: 'factor', ref: fs + '(' + is + ')', ansHtml: fmtTerms(X, f, true) + '(' + fmtTerms(X, inner, true) + ')', vars: X, steps, hint: 'ggT der Zahlen und die kleinste Potenz der Variable vor die Klammer ziehen.' };
+  }
+  if (sub === 1) {
+    if (R.chance(0.5)) {
+      const X = ['x', 'y']; const p = nz(-7, 7), q = nz(-7, 7);
+      const prod = toP(X, [{ c: 1, e: { x: 1, y: 1 } }, { c: q, e: { x: 1 } }, { c: p, e: { y: 1 } }, { c: p * q, e: {} }]);
+      const f1 = 'x ' + (p < 0 ? MINUS : '+') + ' ' + Math.abs(p).toString(), f2 = 'y ' + (q < 0 ? MINUS : '+') + ' ' + Math.abs(q);
+      // (x + p)(y + q) = xy + qx + py + pq
+      const g1 = 'x' + (p < 0 ? '-' : '+') + Math.abs(p), g2 = 'y' + (q < 0 ? '-' : '+') + Math.abs(q);
+      return { html: Q('Faktorisiere durch Gruppieren (vier Glieder). Eingabe z. B. (x+2)(y+3)', pStr(prod, true)), kind: 'factor', ref: '(' + g1 + ')(' + g2 + ')', ansHtml: '(' + f1 + ')(' + f2 + ')', vars: X,
+        steps: ['Bilde zwei Gruppen: die ersten beiden und die letzten beiden Glieder.', 'Klammere in jeder Gruppe aus, bis <b>dieselbe Klammer</b> entsteht:<br>x(y ' + (q < 0 ? MINUS : '+') + ' ' + Math.abs(q) + ') ' + (p < 0 ? MINUS : '+') + ' ' + Math.abs(p) + '(y ' + (q < 0 ? MINUS : '+') + ' ' + Math.abs(q) + ')', 'Jetzt die gemeinsame Klammer ausklammern: <b>(' + f1 + ')(' + f2 + ')</b>', 'Probe: Ausmultiplizieren ergibt wieder den Ausgangsterm.'],
+        hint: 'Gruppe 1 und 2 zusammen, Gruppe 3 und 4 zusammen. In beiden Gruppen so ausklammern, dass die gleiche Klammer entsteht.' };
+    }
+    const L = R.shuffle(['a', 'b', 'c', 'd', 'm', 'r', 's', 'g', 'y']).slice(0, 4); const [A, B, C, E] = L; const s = R.pick([-1, 1]), t = R.pick([-1, 1]);
+    const sg = (n) => (n < 0 ? MINUS : '+'), sa = (n) => (n < 0 ? '-' : '+');
+    const html = A + C + ' ' + sg(t) + ' ' + A + E + ' ' + sg(s) + ' ' + B + C + ' ' + sg(s * t) + ' ' + B + E;
+    const f1 = A + ' ' + sg(s) + ' ' + B, f2 = C + ' ' + sg(t) + ' ' + E;
+    return { html: Q('Faktorisiere durch Gruppieren (vier Glieder). Eingabe z. B. (a+b)(c-d)', html), kind: 'factor', ref: '(' + A + sa(s) + B + ')(' + C + sa(t) + E + ')', ansHtml: '(' + f1 + ')(' + f2 + ')', vars: L,
+      steps: ['Gruppen bilden: (' + A + C + ' ' + sg(t) + ' ' + A + E + ') und (' + B + C + ' ' + sg(s * t) + ' ' + B + E + ')', 'Ausklammern: ' + A + '(' + C + ' ' + sg(t) + ' ' + E + ') ' + sg(s) + ' ' + B + '(' + C + ' ' + sg(t) + ' ' + E + ')', 'Gemeinsame Klammer ausklammern: <b>(' + f1 + ')(' + f2 + ')</b>'],
+      hint: 'Zwei Gruppen bilden. Bei einem Minus vor der zweiten Gruppe das Minus mit ausklammern, damit die Klammern gleich werden.' };
+  }
+  const v = R.pick(['x', 'y', 'a', 'z']); const X = [v]; let k, m; do { k = R.ri(1, 7); m = R.ri(2, 9); } while (gcd(k, m) !== 1);
+  const kv = (k === 1 ? '' : k) + v;
+  if (R.chance(0.5)) {
+    return { html: Q('Faktorisiere mit einer binomischen Formel. Eingabe z. B. (3x-4)(3x+4)', pStr(toP(X, [{ c: k * k, e: { [v]: 2 } }, { c: -m * m, e: {} }]), true)), kind: 'factor', ref: '(' + kv + '-' + m + ')(' + kv + '+' + m + ')', ansHtml: '(' + kv + ' ' + MINUS + ' ' + m + ')(' + kv + ' + ' + m + ')', vars: X,
+      steps: ['Differenz zweier Quadrate: a² − b² = (a − b)(a + b).', 'a² = ' + k * k + v + sup(2) + ' → a = ' + kv + ',&nbsp; b² = ' + m * m + ' → b = ' + m, 'Ergebnis: <b>(' + kv + ' ' + MINUS + ' ' + m + ')(' + kv + ' + ' + m + ')</b>'], hint: 'Erkenne a² − b²: beide Terme sind Quadrate, dazwischen steht ein Minus.' };
+  }
+  const sign = R.pick([-1, 1]);
+  return { html: Q('Faktorisiere mit einer binomischen Formel. Eingabe z. B. (2x+5)^2', pStr(toP(X, [{ c: k * k, e: { [v]: 2 } }, { c: sign * 2 * k * m, e: { [v]: 1 } }, { c: m * m, e: {} }]), true)), kind: 'factor', ref: '(' + kv + (sign < 0 ? '-' : '+') + m + ')^2', ansHtml: '(' + kv + ' ' + (sign < 0 ? MINUS : '+') + ' ' + m + ')' + sup(2), vars: X,
+    steps: ['Prüfe: erstes und letztes Glied sind Quadrate (' + kv + ')² und ' + m + '². Mittelterm = 2·' + kv + '·' + m + ' = ' + 2 * k * m + v + ' passt.', 'Formel ' + (sign < 0 ? '(a − b)² = a² − 2ab + b²' : '(a + b)² = a² + 2ab + b²'), 'Ergebnis: <b>(' + kv + ' ' + (sign < 0 ? MINUS : '+') + ' ' + m + ')' + sup(2) + '</b>'], hint: 'Quadrat einer Summe/Differenz: Wurzel aus dem ersten und letzten Glied, Vorzeichen vom Mittelterm.' };
+}
+/* ---------- 10. Bruchterme ---------- */
+function gBruch(R, sub) {
+  if (sub == null) sub = R.pick([0, 0, 1, 2]);
+  const nz = (a, b) => { let x; do { x = R.ri(a, b); } while (x === 0); return x; };
+  const sg = (n) => (n < 0 ? MINUS : '+');
+  if (sub === 0) {
+    const L = R.shuffle(['a', 'b', 'd', 'g', 'r', 'y', 'x', 'z', 'm', 'n', 'p', 'q', 's', 't']).slice(0, 4); const [A, B, C, E] = L;
+    const s1 = R.pick([-1, 1]), s2 = -s1, t = R.pick([-1, 1]);
+    const num = A + C + ' ' + sg(t) + ' ' + A + E + ' ' + sg(s1) + ' ' + B + C + ' ' + sg(s1 * t) + ' ' + B + E;
+    const den = A + C + ' ' + sg(t) + ' ' + A + E + ' ' + sg(s2) + ' ' + B + C + ' ' + sg(s2 * t) + ' ' + B + E;
+    const fr = (x, y, sx, sy) => frac(x[0] + ' ' + sg(sx) + ' ' + x[1], y[0] + ' ' + sg(sy) + ' ' + y[1]);
+    const opts = [fr([A, B], [A, B], s1, s2), fr([A, B], [A, B], s2, s1), fr([C, E], [C, E], t, -t), fr([B, A], [B, A], s1, s2)];
+    const uniq = [...new Set(opts)]; while (uniq.length < 4) uniq.push(fr([A, B], [A, B], -s1, -s2) + ' ');
+    const order = R.shuffle([0, 1, 2, 3]); const options = order.map((i) => uniq[i]); const correct = order.indexOf(0);
+    return { html: Q('<b>Vereinfache</b> den folgenden Ausdruck und wähle das Ergebnis.', frac(num, den)), kind: 'mc', options, correct, ref: 'ABCD'[correct], ansHtml: options[correct], vars: [],
+      steps: ['Zähler: Gruppen bilden und ausklammern → <b>(' + A + ' ' + sg(s1) + ' ' + B + ')(' + C + ' ' + sg(t) + ' ' + E + ')</b>', 'Nenner genauso → <b>(' + A + ' ' + sg(s2) + ' ' + B + ')(' + C + ' ' + sg(t) + ' ' + E + ')</b>', 'Die gemeinsame Klammer (' + C + ' ' + sg(t) + ' ' + E + ') kürzen. Es bleibt: ' + options[correct]],
+      hint: 'Zähler und Nenner durch Gruppieren faktorisieren. Dann den gemeinsamen Faktor kürzen.' };
+  }
+  if (sub === 1) {
+    let p, q; do { p = nz(-6, 6); q = nz(-6, 6); } while (p === q);
+    let a, b, c, d; do { a = R.ri(2, 9); b = R.ri(2, 9); c = R.ri(2, 9); d = R.ri(2, 9); } while (a * c === b * d);
+    const X = ['x']; const lin = (k, r) => fmtTerms(X, [{ c: k, e: { x: 1 } }, { c: k * r, e: {} }], true);
+    const linF = (k, r) => k + '(x ' + sg(r) + ' ' + Math.abs(r) + ')';
+    const g = gcd(a * c, b * d), cn = a * c / g, cd = b * d / g;
+    return { html: Q('Multipliziere. (Antwort als ganze Zahl oder Bruch, vollständig gekürzt.)', frac(lin(a, p), lin(b, q)) + ' <span class="op">·</span> ' + frac(lin(c, q), lin(d, p))), kind: 'num', tol: 6e-4, answer: a * c / (b * d), ref: cn + '/' + cd, ansHtml: cd === 1 ? String(cn) : frac(cn, cd), vars: [],
+      steps: ['Zuerst in jedem Zähler und Nenner <b>ausklammern</b>:<br>' + frac(linF(a, p), linF(b, q)) + ' · ' + frac(linF(c, q), linF(d, p)), 'Gemeinsame Klammern kürzen: (x ' + sg(p) + ' ' + Math.abs(p) + ') oben und unten, (x ' + sg(q) + ' ' + Math.abs(q) + ') oben und unten.', 'Übrig bleiben nur die Zahlen: ' + frac(a + '·' + c, b + '·' + d) + ' = ' + frac(a * c, b * d) + (g > 1 ? ' = ' + (cd === 1 ? cn : frac(cn, cd)) : '')],
+      hint: 'Erst ausklammern (z. B. 5x−10 = 5(x−2)), dann gleiche Klammern über Kreuz kürzen.' };
+  }
+  const p = R.ri(2, 7), q = nz(-6, 6), m = R.ri(2, 6); if (q === p || q === -p) return gBruch(R, 2);
+  const X = ['x']; const xx = toP(X, [{ c: 1, e: { x: 2 } }, { c: -p * p, e: {} }]);
+  const den1 = [{ c: m, e: { x: 1 } }, { c: m * q, e: {} }];
+  return { html: Q('Dividiere und vereinfache. (Eingabe z. B. (x-3)/2)', frac(pStr(xx, true), fmtTerms(X, den1, true)) + ' <span class="op">÷</span> ' + frac('x + ' + p, 'x ' + sg(q) + ' ' + Math.abs(q))), kind: 'ratfun', ref: '(x-' + p + ')/' + m, ansHtml: frac('x ' + MINUS + ' ' + p, m), vars: X,
+    steps: ['Kehrwert des zweiten Bruchs, dann mal:<br>' + frac(pStr(xx, true), fmtTerms(X, den1, true)) + ' · ' + frac('x ' + sg(q) + ' ' + Math.abs(q), 'x + ' + p), 'Faktorisieren: x² − ' + p * p + ' = (x − ' + p + ')(x + ' + p + '), &nbsp;' + fmtTerms(X, den1, true) + ' = ' + m + '(x ' + sg(q) + ' ' + Math.abs(q) + ')', 'Kürzen von (x + ' + p + ') und (x ' + sg(q) + ' ' + Math.abs(q) + '): <b>' + frac('x ' + MINUS + ' ' + p, m) + '</b>'],
+    hint: 'Zweiten Bruch umdrehen. Zähler mit a²−b² = (a−b)(a+b) faktorisieren, Nenner ausklammern, dann kürzen.' };
+}
+
+/* ---------- 11. Bruchregeln wahr/falsch ---------- */
+const REGELN = [
+  [(a, b, c) => frac(a, frac(b, c)) + ' = ' + frac(a + c, b), true, (a, b, c) => 'Durch einen Bruch teilen = mit dem Kehrwert multiplizieren: ' + a + ' ÷ ' + frac(b, c) + ' = ' + a + ' · ' + frac(c, b) + ' = ' + frac(a + c, b)],
+  [(a, b, c) => frac(frac(a, b), c) + ' = ' + frac(a + c, b), false, (a, b, c) => 'Richtig wäre ' + frac(frac(a, b), c) + ' = ' + frac(a, b + c) + '. Das ' + c + ' gehört in den Nenner.'],
+  [(a, b, c) => frac(a, b + ' + ' + c) + ' = ' + frac(a, b) + ' + ' + frac(a, c), false, (a, b, c) => 'Den Nenner darf man nicht aufteilen. Test mit ' + a + ' = 1, ' + b + ' = 1, ' + c + ' = 1: links ½, rechts 2.'],
+  [(a, b, c) => frac(a + ' + ' + b, c) + ' = ' + frac(a, c) + ' + ' + frac(b, c), true, (a, b, c) => 'Den Zähler darf man aufteilen: Jeder Summand wird durch ' + c + ' geteilt.'],
+  [(a, b, c) => frac(a, b) + ' = ' + frac(a + ' + ' + c, b + ' + ' + c), false, (a, b, c) => 'Erweitern geht nur mit Mal, nicht mit Plus. Test ' + a + ' = 1, ' + b + ' = 2, ' + c + ' = 1: links ½, rechts ⅔.'],
+  [(a, b, c) => frac(a + b, a + c) + ' = ' + frac(b, c), true, (a, b, c) => 'Der gemeinsame <b>Faktor</b> ' + a + ' darf gekürzt werden.'],
+  [(a, b) => frac(a + ' + ' + b, a) + ' = ' + b, false, (a, b) => 'Aus Summen kürzt man nicht! Richtig: ' + frac(a + ' + ' + b, a) + ' = 1 + ' + frac(b, a) + '.'],
+  [(a, b, c, d) => frac(a, b) + ' ÷ ' + frac(c, d) + ' = ' + frac(a + d, b + c), true, (a, b, c, d) => 'Durch Bruch teilen: mit dem Kehrwert multiplizieren, also ' + frac(a, b) + ' · ' + frac(d, c) + '.'],
+  [(a, b, c, d) => frac(a, b) + ' ÷ ' + frac(c, d) + ' = ' + frac(a + c, b + d), false, (a, b, c, d) => 'Das wäre die Multiplikation. Bei der Division muss der zweite Bruch umgedreht werden.'],
+  [(a, b, c, d) => frac(a, b) + ' + ' + frac(c, d) + ' = ' + frac(a + ' + ' + c, b + ' + ' + d), false, (a, b, c, d) => 'Addieren braucht den gemeinsamen Nenner: ' + frac(a + d + ' + ' + b + c, b + d) + '. Test mit 1/2 + 1/3 = 5/6, nicht 2/5.'],
+  [(a, b, c) => frac(a, b) + ' + ' + frac(c, b) + ' = ' + frac(a + ' + ' + c, b), true, (a, b, c) => 'Gleicher Nenner: Zähler addieren, Nenner bleibt.'],
+  [(a, b, c, d) => frac(a, b) + ' · ' + frac(c, d) + ' = ' + frac(a + c, b + d), true, (a, b, c, d) => 'Multiplizieren: Zähler mal Zähler, Nenner mal Nenner.'],
+  [(a, b) => '(' + frac(a, b) + ')' + sup(-1) + ' = ' + frac(b, a), true, (a, b) => 'Hoch −1 heisst Kehrwert: Bruch umdrehen.'],
+  [(a, b) => frac(a, MINUS + b) + ' = ' + MINUS + frac(a, b), true, (a, b) => 'Ein Minus im Nenner darf man vor den Bruch ziehen.'],
+  [(a, b) => frac(a + ' ' + MINUS + ' ' + b, b + ' ' + MINUS + ' ' + a) + ' = ' + MINUS + '1', true, (a, b) => 'Zähler und Nenner unterscheiden sich nur im Vorzeichen: (' + a + ' − ' + b + ') = −(' + b + ' − ' + a + ').'],
+  [(a, b, c, d) => frac(a, b) + ' ' + MINUS + ' ' + frac(c, d) + ' = ' + frac(a + ' ' + MINUS + ' ' + c, b + ' ' + MINUS + ' ' + d), false, (a, b, c, d) => 'Subtrahieren braucht den gemeinsamen Nenner: ' + frac(a + d + ' ' + MINUS + ' ' + b + c, b + d) + '.'],
+  [(a, b) => frac(1, frac(a, b)) + ' = ' + frac(b, a), true, (a, b) => '1 ÷ ' + frac(a, b) + ' = 1 · ' + frac(b, a) + ' = ' + frac(b, a)],
+  [(a, b, c) => frac(a, b + c) + ' = ' + frac(frac(a, b), c), true, (a, b, c) => 'Zuerst durch ' + b + ', dann durch ' + c + ' teilen ist dasselbe wie durch ' + b + c + ' teilen.'],
+  [(a, b, c) => frac(a + b + ' + ' + a + c, a) + ' = ' + b + ' + ' + c, true, (a, b, c) => 'Im Zähler ' + a + ' ausklammern: ' + frac(a + '(' + b + ' + ' + c + ')', a) + ', dann ' + a + ' kürzen.'],
+  [(a, b, c) => frac(a + b, a + ' + ' + c) + ' = ' + frac(b, c), false, (a, b, c) => 'Im Nenner steht eine Summe, man kürzt nur Faktoren. Test ' + a + ' = 1, ' + b + ' = 2, ' + c + ' = 3: links 2/4, rechts 2/3.'],
+];
+function gRegel(R) {
+  const L = R.pick([['a', 'b', 'c', 'd'], ['x', 'y', 'z', 'w'], ['m', 'n', 'p', 'q'], ['r', 's', 't', 'u']]);
+  const it = R.pick(REGELN); const html = it[0](...L);
+  return { html: Q('Entscheide, ob die folgende Aussage über <b>Rechenregeln für Brüche</b> wahr oder falsch ist.', html), kind: 'tf', options: ['Wahr', 'Falsch'], correct: it[1] ? 0 : 1, ref: it[1] ? 'Wahr' : 'Falsch', ansHtml: it[1] ? 'Wahr' : 'Falsch', vars: [],
+    steps: [(it[1] ? '<b>Wahr.</b> ' : '<b>Falsch.</b> ') + it[2](...L)], hint: 'Setze kleine Zahlen ein (z. B. 1, 2, 3). Wenn links und rechts verschieden herauskommen, ist die Aussage falsch.' };
+}
+
+/* ---------- Themen ---------- */
+const TOPICS = [
+  { id: 'pot', name: 'Potenzen & negative Exponenten', short: 'Potenzen', gen: gPot, subs: 4, color: '#2f7d5b' },
+  { id: 'sci', name: 'Zahl ohne Exponenten', short: 'Zehnerpotenzen', gen: gSci, subs: 2, color: '#6b5bb5' },
+  { id: 'mono', name: 'Monome kürzen & dividieren', short: 'Monome', gen: gMono, subs: 2, color: '#b5651d' },
+  { id: 'pct', name: 'Prozent, Wertverlust, MwSt', short: 'Prozent', gen: gPct, subs: 5, color: '#c2412f' },
+  { id: 'term', name: 'Terme aufstellen (Fläche, Gewinn)', short: 'Terme', gen: gTerm, subs: 3, color: '#1f7a8c' },
+  { id: 'klam', name: 'Klammern & Polynome', short: 'Polynome', gen: gKlam, subs: 3, color: '#a23b72' },
+  { id: 'dist', name: 'Distributivgesetz', short: 'Ausmultiplizieren', gen: gDist, subs: 3, color: '#3d5a9e' },
+  { id: 'binom', name: 'Binomische Formeln', short: 'Binomisch', gen: gBinom, subs: 3, color: '#b8860b' },
+  { id: 'fakt', name: 'Faktorisieren', short: 'Faktorisieren', gen: gFakt, subs: 3, color: '#2a8a8a' },
+  { id: 'bruch', name: 'Bruchterme', short: 'Bruchterme', gen: gBruch, subs: 3, color: '#5a7d2a' },
+  { id: 'regel', name: 'Bruchregeln wahr/falsch', short: 'Bruchregeln', gen: gRegel, subs: 1, color: '#7a5548' },
+];
+const EXAM = [['mono', 0], ['pct', 0], ['pot', 0], ['pct', 1], ['sci', 0], ['term', 0], ['term', 1], ['dist', 0], ['klam', 2], ['binom', 1], ['bruch', 0], ['mono', 1], ['bruch', 1], ['regel', 0], ['pot', 2]];
+
+function makeProblem(topicId, seed, sub) {
+  const t = TOPICS.find((x) => x.id === topicId);
+  const R = makeR(seed);
+  const p = t.gen(R, sub);
+  p.topic = topicId; p.seed = seed; p.topicName = t.name;
+  return p;
+}
+
+/* ---------- Antwort prüfen ---------- */
+function checkAnswer(p, input) {
+  switch (p.kind) {
+    case 'mono': return checkMono(input, p.answer);
+    case 'poly': return checkPoly(input, p.answer);
+    case 'factor': return checkFactor(input, p.ref);
+    case 'ratfun': return checkRat(input, p.ref);
+    case 'num': return checkNum(input, p.answer, p.tol || 6e-4);
+    case 'money': return checkNum(input, p.answer, p.tol || 0.006);
+    case 'exact': { const r = safeParse(input); if (r.err) return { ok: false, msg: 'Bitte eine Zahl eingeben, z. B. 0.000094172.' }; if (varsOf(r.n).size) return { ok: false, msg: 'Nur Ziffern und Dezimalpunkt verwenden.' }; const x = ev(r.n, {}); return near(x, p.answer, 1e-9) ? { ok: true } : { ok: false, msg: 'Der Wert stimmt nicht. Zähle die Stellen nochmals.' }; }
+    case 'sci': return checkSci(input, p.answer);
+    case 'tf': case 'mc': return { ok: Number(input) === p.correct };
+    case 'multi': { const res = p.fields.map((f, i) => checkNum(input[i] || '', f.answer, f.tol)); return { ok: res.every((r) => r.ok), each: res.map((r) => r.ok), msg: (res.find((r) => !r.ok) || {}).msg }; }
+  }
+  return { ok: false, msg: 'Unbekannte Aufgabe.' };
+}
+
+
+/* ================= OBERFLÄCHE ================= */
+(function () {
+  const $app = document.getElementById('app');
+  const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const rnd = () => Math.floor(Math.random() * 2147483000) + 1;
+  const KEY = 'mathe-training-v1';
+  let data = { total: 0, ok: 0, streak: 0, best: 0, topics: {}, wrong: [] };
+  try { const raw = localStorage.getItem(KEY); if (raw) data = Object.assign(data, JSON.parse(raw)); } catch (e) { /* ohne Speicher weiter */ }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { /* ignorieren */ } };
+  const T = (id) => TOPICS.find((t) => t.id === id);
+
+  let S = null; // Sitzung
+  let lastInput = null;
+
+  /* ---------- Startseite ---------- */
+  function home() {
+    S = null;
+    const acc = data.total ? Math.round((data.ok / data.total) * 100) + ' %' : '–';
+    const rows = TOPICS.map((t) => {
+      const st = data.topics[t.id] || { n: 0, ok: 0 }; const pc = st.n ? Math.round((st.ok / st.n) * 100) : 0;
+      return '<button class="row" data-act="topic" data-id="' + t.id + '"><span class="dot" style="background:' + t.color + '"></span><span><span class="t">' + esc(t.name) + '</span><span class="meter" style="display:block"><i style="width:' + pc + '%;display:block"></i></span></span><span class="m">' + (st.n ? st.ok + '/' + st.n : 'neu') + '</span></button>';
+    }).join('');
+    $app.innerHTML =
+      '<h1>Mathe-Training</h1><p class="sub">Algebra-Prüfung, 11 Themen. Jede Aufgabe ist neu, mit Lösungsweg.</p>' +
+      '<div class="stats"><div class="stat"><b>' + data.total + '</b><span>Gelöst</span></div><div class="stat"><b>' + acc + '</b><span>Richtig</span></div><div class="stat"><b>' + data.streak + '</b><span>Serie (Best ' + data.best + ')</span></div></div>' +
+      '<div class="stack"><button class="btn primary" data-act="mix">Gemischt üben, endlos</button>' +
+      '<div class="grid2"><button class="btn" data-act="exam">Prüfungs-Simulation (15)</button><button class="btn" data-act="review"' + (data.wrong.length ? '' : ' disabled') + '>Fehler wiederholen (' + data.wrong.length + ')</button></div></div>' +
+      '<h2 style="margin-top:22px">Nach Thema üben</h2><div class="topics">' + rows + '</div>' +
+      '<p class="small muted" style="margin-top:18px">Eingabe: Hochzahl mit ^ (x^2), Bruch mit / und Klammern: (3a^2)/(4b^3). Die Symbolleiste hilft beim Tippen.</p>' +
+      '<button class="linkbtn" data-act="reset">Statistik zurücksetzen</button>';
+  }
+
+  /* ---------- Sitzung ---------- */
+  function start(mode, topic) {
+    S = { mode, topic, idx: 0, ok: 0, n: 0, results: [], queue: null };
+    if (mode === 'exam') S.queue = EXAM.map((x) => ({ t: x[0], sub: x[1], seed: rnd() }));
+    if (mode === 'review') S.queue = data.wrong.map((w) => Object.assign({}, w));
+    next(true);
+  }
+  function pickTopic() {
+    const w = TOPICS.map((t) => { const s = data.topics[t.id]; const n = s ? s.n : 0; const acc = n ? s.ok / n : 0.5; return 1 + 3 * (1 - acc) + (n < 3 ? 1.5 : 0); });
+    let r = Math.random() * w.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < w.length; i++) { r -= w[i]; if (r <= 0) return TOPICS[i].id; }
+    return TOPICS[0].id;
+  }
+  function next(first) {
+    if (!first && S.queue) S.idx++;
+    let spec;
+    if (S.queue) { if (S.idx >= S.queue.length) return summary(); spec = S.queue[S.idx]; }
+    else spec = { t: S.mode === 'topic' ? S.topic : pickTopic(), seed: rnd(), sub: null };
+    S.spec = spec; S.p = makeProblem(spec.t, spec.seed, spec.sub == null ? undefined : spec.sub);
+    S.phase = 'ask'; S.counted = false; S.msg = ''; S.hint = false; S.pick = -1; S.each = null;
+    render(); window.scrollTo(0, 0);
+    const a = document.getElementById('ans0'); if (a && !('ontouchstart' in window)) a.focus();
+  }
+  function record(ok) {
+    if (S.counted) return; S.counted = true;
+    const id = S.p.topic; const tp = data.topics[id] || (data.topics[id] = { n: 0, ok: 0 });
+    tp.n++; data.total++; S.n++;
+    if (ok) { tp.ok++; data.ok++; data.streak++; S.ok++; data.best = Math.max(data.best, data.streak); } else data.streak = 0;
+    S.results.push({ t: id, ok });
+    const same = (w) => w.t === S.spec.t && w.seed === S.spec.seed;
+    if (!ok) { if (!data.wrong.some(same)) data.wrong.unshift({ t: S.spec.t, seed: S.spec.seed, sub: S.spec.sub == null ? null : S.spec.sub }); data.wrong = data.wrong.slice(0, 60); }
+    else if (S.mode === 'review') data.wrong = data.wrong.filter((w) => !same(w));
+    save();
+  }
+
+  /* ---------- Ansicht: Aufgabe ---------- */
+  const HELP = {
+    mono: 'Schreibe z. B. 9/m^8 oder 9m^-8. Bei Brüchen Zähler und Nenner in Klammern: (3a^2)/(4b^3).',
+    poly: 'Hochzahl mit ^, z. B. 4x^2 + 3x - 6. Alles ausmultipliziert und zusammengefasst.',
+    factor: 'Mit Klammern schreiben, z. B. 3x(x+2) oder (a+2)(b-3).',
+    ratfun: 'Bruch mit Klammern, z. B. (x-3)/2.',
+    num: 'Zahl oder Bruch, z. B. 13/36 oder 0.25.',
+    money: 'Zahl mit Dezimalpunkt, z. B. 101.15.',
+    exact: 'Nur Ziffern und Dezimalpunkt, z. B. 0.000094172.',
+    sci: 'Form: 8.14*10^-4',
+    multi: 'Zahl mit Dezimalpunkt, auf Cent genau.',
+  };
+  function fieldsHTML(p, disabled) {
+    const fs = p.kind === 'multi' ? p.fields : [{ label: 'Deine Antwort', unit: p.unit }];
+    return fs.map((f, i) => '<div class="field"><label for="ans' + i + '">' + esc(f.label) + '</label><div class="inwrap"><input type="text" id="ans' + i + '" data-i="' + i + '" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="done"' + (disabled ? ' disabled' : '') + ' value="' + esc((S.vals && S.vals[i]) || '') + '">' + (f.unit ? '<span class="unit">' + esc(f.unit) + '</span>' : '') + '</div></div>').join('');
+  }
+  function keysHTML(p) {
+    const base = ['^', '/', '(', ')', '·', '+', '−', '.'];
+    const vs = [...new Set(p.vars || [])];
+    const keys = (p.kind === 'multi' || p.kind === 'money' || p.kind === 'exact') ? ['.', '−'] : (p.kind === 'num' ? ['/', '.', '−', '(', ')', '^'] : base.concat(vs));
+    return '<div class="keys" aria-label="Symbolleiste">' + keys.map((k) => '<button type="button" class="key" data-act="ins" data-k="' + k + '">' + k + '</button>').join('') + '<button type="button" class="key" data-act="del" aria-label="Löschen">⌫</button></div>';
+  }
+  function optionsHTML(p) {
+    return '<div class="opts ' + p.kind + '">' + p.options.map((o, i) => {
+      let cls = 'opt'; if (S.phase === 'done') { if (i === p.correct) cls += ' right'; else if (i === S.pick) cls += ' wrong'; }
+      return '<button class="' + cls + '" data-act="pick" data-i="' + i + '"' + (S.phase === 'done' ? ' disabled' : '') + '>' + (p.kind === 'mc' ? '<b>' + 'ABCD'[i] + '</b><span class="math sm">' + o + '</span>' : '<span>' + o + '</span>') + '</button>';
+    }).join('') + '</div>';
+  }
+  function render() {
+    const p = S.p; const isChoice = p.kind === 'tf' || p.kind === 'mc';
+    const t = T(p.topic); const exam = S.mode === 'exam';
+    const title = exam ? 'Aufgabe ' + (S.idx + 1) + ' von ' + S.queue.length : (S.mode === 'review' ? 'Fehler wiederholen' : (S.mode === 'mix' ? 'Gemischt' : t.name));
+    let h = '<div class="bar"><button class="btn ghost back" data-act="home" aria-label="Zurück zur Übersicht">←</button><div class="ttl">' + esc(title) + '</div><div class="score">' + S.ok + ' / ' + S.n + '</div></div>';
+    if (S.queue) h += '<div class="prog" aria-hidden="true"><i style="width:' + Math.round((S.idx / S.queue.length) * 100) + '%"></i></div>';
+    h += '<div class="card">' + (S.mode === 'mix' || S.mode === 'review' || exam ? '<div class="small muted" style="margin-bottom:6px">' + esc(t.short) + '</div>' : '') + p.html;
+    if (isChoice) h += optionsHTML(p); else h += fieldsHTML(p, S.phase === 'done') + (S.phase === 'done' ? '' : keysHTML(p) + '<p class="help">' + esc(HELP[p.kind] || '') + '</p>');
+    if (S.hint && S.phase !== 'done') h += '<div class="hint"><b>Tipp:</b> ' + p.hint + '</div>';
+    h += '</div>';
+    if (S.phase === 'ask' && S.msg) h += '<div class="res bad" role="alert">Noch nicht richtig<small>' + esc(S.msg) + '</small></div>';
+    if (S.phase === 'done') {
+      const good = S.lastOk;
+      h += '<div class="res ' + (good ? 'ok' : 'bad') + '" role="status">' + (good ? (S.counted && S.firstOk === false ? 'Jetzt stimmt es' : 'Richtig') : 'Nicht ganz') + (S.msg && !good ? '<small>' + esc(S.msg) + '</small>' : '') + '</div>';
+      h += '<div class="card"><h2>' + (good ? 'So geht der Lösungsweg' : 'Lösung und Lösungsweg') + '</h2><p class="ans">Richtig ist: <span class="math">' + p.ansHtml + '</span></p><ol class="steps">' + p.steps.map((s) => '<li>' + s + '</li>').join('') + '</ol></div>';
+      h += '<button class="btn primary" data-act="next" id="nextbtn">' + (exam && S.idx === S.queue.length - 1 ? 'Auswertung' : (S.queue && S.idx === S.queue.length - 1 ? 'Fertig' : 'Nächste Aufgabe')) + '</button>';
+    } else {
+      h += '<div class="grid2">' + (S.hint ? '<button class="btn" data-act="solve">Lösung zeigen</button>' : (exam ? '<button class="btn" data-act="solve">Überspringen</button>' : '<button class="btn" data-act="hint">Tipp</button>')) + (isChoice ? '<button class="btn" data-act="solve">Lösung zeigen</button>' : '<button class="btn primary" data-act="check">Prüfen</button>') + '</div>';
+    }
+    $app.innerHTML = h;
+  }
+  function readVals() {
+    const n = S.p.kind === 'multi' ? S.p.fields.length : 1; const v = [];
+    for (let i = 0; i < n; i++) { const el = document.getElementById('ans' + i); v.push(el ? el.value : ''); }
+    return v;
+  }
+  function check() {
+    const p = S.p; S.vals = readVals();
+    if (S.vals.every((x) => !x.trim())) { S.msg = 'Gib zuerst eine Antwort ein.'; render(); return; }
+    const res = checkAnswer(p, p.kind === 'multi' ? S.vals : S.vals[0]);
+    if (res.ok) { S.firstOk = !S.counted; record(true); S.lastOk = true; S.phase = 'done'; S.msg = ''; render(); scrollRes(); }
+    else { if (!S.counted) { S.firstOk = false; record(false); } S.msg = res.msg || 'Das stimmt noch nicht.'; render(); scrollRes(); const a = document.getElementById('ans0'); if (a) a.focus(); }
+  }
+  function scrollRes() { const el = document.querySelector('.res'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+  function solve() { if (S.p.kind !== 'tf' && S.p.kind !== 'mc') S.vals = readVals(); if (!S.counted) { S.firstOk = false; record(false); } S.lastOk = false; S.phase = 'done'; S.msg = ''; render(); scrollRes(); }
+  function pickOpt(i) {
+    if (S.phase === 'done') return; S.pick = i; const ok = i === S.p.correct; record(ok); S.firstOk = ok; S.lastOk = ok; S.phase = 'done'; render(); scrollRes();
+  }
+
+  /* ---------- Auswertung ---------- */
+  function summary() {
+    const n = S.results.length, ok = S.results.filter((r) => r.ok).length; const pc = n ? Math.round((ok / n) * 100) : 0;
+    const by = {}; S.results.forEach((r) => { (by[r.t] = by[r.t] || []).push(r.ok); });
+    const rows = Object.keys(by).map((id) => '<div class="sumrow"><span>' + esc(T(id).name) + '</span><b>' + by[id].filter(Boolean).length + ' / ' + by[id].length + '</b></div>').join('');
+    const msg = pc >= 85 ? 'Sehr stark.' : pc >= 60 ? 'Solide. Die roten Themen nochmals üben.' : 'Noch Luft nach oben. Übe die Themen unten einzeln.';
+    $app.innerHTML = '<div class="bar"><button class="btn ghost back" data-act="home" aria-label="Zurück">←</button><div class="ttl">Auswertung</div></div><div class="card"><div class="big">' + ok + ' / ' + n + '</div><p class="muted" style="margin:4px 0 12px">' + pc + ' % richtig. ' + msg + '</p>' + rows + '</div><div class="stack"><button class="btn primary" data-act="' + (S.mode === 'review' ? 'review' : 'exam') + '">Nochmal</button><button class="btn" data-act="home">Zur Übersicht</button></div>';
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- Ereignisse ---------- */
+  document.addEventListener('focusin', (e) => { if (e.target && e.target.matches && e.target.matches('input[type=text]')) lastInput = e.target; });
+  $app.addEventListener('pointerdown', (e) => { if (e.target.closest && e.target.closest('.key')) e.preventDefault(); });
+  $app.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-act]'); if (!b || b.disabled) return; const a = b.dataset.act;
+    if (a === 'topic') start('topic', b.dataset.id);
+    else if (a === 'mix') start('mix');
+    else if (a === 'exam') start('exam');
+    else if (a === 'review') { if (data.wrong.length) start('review'); }
+    else if (a === 'home') home();
+    else if (a === 'next') next();
+    else if (a === 'check') check();
+    else if (a === 'solve') solve();
+    else if (a === 'hint') { S.hint = true; S.vals = readVals(); render(); }
+    else if (a === 'pick') pickOpt(Number(b.dataset.i));
+    else if (a === 'ins' || a === 'del') {
+      const el = (lastInput && document.body.contains(lastInput)) ? lastInput : document.getElementById('ans0'); if (!el) return;
+      el.focus(); const s = el.selectionStart == null ? el.value.length : el.selectionStart, en = el.selectionEnd == null ? s : el.selectionEnd;
+      if (a === 'ins') { const k = b.dataset.k; el.value = el.value.slice(0, s) + k + el.value.slice(en); el.setSelectionRange(s + k.length, s + k.length); }
+      else if (s !== en) { el.value = el.value.slice(0, s) + el.value.slice(en); el.setSelectionRange(s, s); }
+      else if (s > 0) { el.value = el.value.slice(0, s - 1) + el.value.slice(s); el.setSelectionRange(s - 1, s - 1); }
+    }
+    else if (a === 'reset') { if (b.dataset.sure) { data = { total: 0, ok: 0, streak: 0, best: 0, topics: {}, wrong: [] }; save(); home(); } else { b.dataset.sure = '1'; b.textContent = 'Wirklich löschen? Nochmals tippen.'; } }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || !S || !S.p) return;
+    if (S.phase === 'done') { const nb = document.getElementById('nextbtn'); if (nb) { e.preventDefault(); next(); } }
+    else if (e.target && e.target.matches && e.target.matches('input[type=text]')) {
+      e.preventDefault(); const i = Number(e.target.dataset.i || 0); const nx = document.getElementById('ans' + (i + 1));
+      if (nx) nx.focus(); else check();
+    }
+  });
+  home();
+  window.__mt = { start, home, get S() { return S; } };
+})();
+
+})();
+</script>
+</body></html>
